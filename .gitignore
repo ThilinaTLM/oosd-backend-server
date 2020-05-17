@@ -4,3 +4,4 @@ dist
 
 # Files
 yarn.lock
+.env

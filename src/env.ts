@@ -12,3 +12,6 @@ export const MYSQL_PROFILE: ConnectionProfile = {
     password: process.env.DB_PASS || "",
     database: process.env.DB_DBASE || "test"
 };
+
+export const SECRET: string = process.env.SECRET || "defaultsecret";
+export const SALT_ROUNDS: number = Number(process.env.SALT_ROUNDS) || 10;
