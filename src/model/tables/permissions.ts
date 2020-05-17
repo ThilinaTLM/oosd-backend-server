@@ -1,26 +1,35 @@
-import Sequelize, {
+import {
+    Sequelize,
+    Model,
+    DataTypes,
     ModelAttributes,
-    Sequelize as TypeSequelize
+    InitOptions
 } from "sequelize";
+
+export class Permission extends Model {}
 
 const columns: ModelAttributes = {
     permissionId: {
-        type: Sequelize.INTEGER,
+        type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true
     },
 
     permissionName: {
-        type: Sequelize.STRING(50),
+        type: DataTypes.STRING(50),
         allowNull: false
     }
 };
 
-export default (sequelize: TypeSequelize) => {
-    class Permission extends Sequelize.Model {}
-    Permission.init(columns, {
+export default function createModel(sequelize: Sequelize) {
+    const options: InitOptions = {
         sequelize,
-        modelName: "permissions"
-    });
+        modelName: "permissions",
+        underscored: true,
+        timestamps: false,
+        freezeTableName: true
+    };
+
+    Permission.init(columns, options);
     return Permission;
-};
+}

@@ -67,8 +67,7 @@ export default function createModel(sequelize: Sequelize) {
         sequelize,
         modelName: "users",
         underscored: true,
-        updatedAt: true,
-        createdAt: true,
+        timestamps: true,
         freezeTableName: true
     };
 

@@ -1,36 +1,45 @@
-import Sequelize, {
+import {
+    Sequelize,
+    Model,
+    DataTypes,
     ModelAttributes,
-    Sequelize as TypeSequelize
+    InitOptions
 } from "sequelize";
+
+export class RolePermissionRule extends Model {}
 
 const columns: ModelAttributes = {
     ruleId: {
-        type: Sequelize.INTEGER,
+        type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true
     },
 
     userId: {
-        type: Sequelize.INTEGER,
+        type: DataTypes.INTEGER,
         allowNull: false
     },
 
     permissionId: {
-        type: Sequelize.INTEGER,
+        type: DataTypes.INTEGER,
         allowNull: false
     },
 
     allowed: {
-        type: Sequelize.BOOLEAN,
+        type: DataTypes.BOOLEAN,
         defaultValue: true // true means allowed
     }
 };
 
-export default (sequelize: TypeSequelize) => {
-    class RolePermission extends Sequelize.Model {}
-    RolePermission.init(columns, {
+export default function createModel(sequelize: Sequelize) {
+    const options: InitOptions = {
         sequelize,
-        modelName: "rolePermissions"
-    });
-    return RolePermission;
-};
+        modelName: "role_permission_rules",
+        underscored: true,
+        timestamps: true,
+        freezeTableName: true
+    };
+
+    RolePermissionRule.init(columns, options);
+    return RolePermissionRule;
+}

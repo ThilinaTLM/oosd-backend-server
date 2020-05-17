@@ -1,26 +1,35 @@
-import Sequelize, {
+import {
+    Sequelize,
+    Model,
+    DataTypes,
     ModelAttributes,
-    Sequelize as TypeSequelize
+    InitOptions
 } from "sequelize";
+
+export class Role extends Model {}
 
 const columns: ModelAttributes = {
     roleId: {
-        type: Sequelize.INTEGER,
+        type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true
     },
 
     roleName: {
-        type: Sequelize.STRING(50),
+        type: DataTypes.STRING(50),
         allowNull: false
     }
 };
 
-export default (sequelize: TypeSequelize) => {
-    class Role extends Sequelize.Model {}
-    Role.init(columns, {
+export default function createModel(sequelize: Sequelize) {
+    const options: InitOptions = {
         sequelize,
-        modelName: "roles"
-    });
+        modelName: "roles",
+        underscored: true,
+        timestamps: false,
+        freezeTableName: true
+    };
+
+    Role.init(columns, options);
     return Role;
-};
+}
