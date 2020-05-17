@@ -1,11 +1,21 @@
-import express from 'express';
+import express, { Request, Response } from "express";
 
-const PORT = 8080;
+import rApi from "./api";
+import { PORT } from "./env";
+import models from "./model";
+
+// Request Handlers ---------------------------------------------------------------------
+
+function index(req: Request, res: Response) {
+    res.send("Welcome");
+}
+
+//---------------------------------------------------------------------------------------
 
 const app = express();
 
-app.get('/', (req, res) => {
-    res.send('Hello');
-});
+app.locals.models = models;
+app.use("/api/", rApi);
+app.get("/", index);
 
 app.listen(PORT, () => console.log(`Listening at port ${PORT}`));
