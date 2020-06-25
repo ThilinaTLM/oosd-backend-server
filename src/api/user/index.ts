@@ -40,6 +40,7 @@ async function signIn(req: Request, res: Response) {
         userData?: any;
         token?: string;
         msg?: string;
+        statusCode?: number;
     } = {};
 
     const user: any = await User.findOne({
@@ -50,7 +51,10 @@ async function signIn(req: Request, res: Response) {
     });
 
     if (!user) {
-        return res.status(404).send("Wrong username or password!");
+        resData.statusCode = 404;
+        resData.state = "FAILED";
+        resData.msg = "Wrong username or password!";
+        return res.status(resData.statusCode).json(resData);
     }
 
     const pass: any = await Password.findOne({
@@ -61,15 +65,24 @@ async function signIn(req: Request, res: Response) {
     });
 
     if (!pass.active) {
-        return res.status(400).send("User has not activated!");
+        resData.statusCode = 400;
+        resData.state = "FAILED";
+        resData.msg = "User has not activated!";
+        return res.status(resData.statusCode).json(resData);
     }
 
     const correctPass = await bcrypt.compare(password, pass.hash);
     if (correctPass) {
-        user.authenticated = true;
-        return res.json(user);
+        resData.statusCode = 200;
+        resData.state = "SUCCESS";
+        resData.userData = user;
+        resData.token = jwt.sign(user.toJSON(), SECRET);
+        return res.status(resData.statusCode).json(resData);
     } else {
-        return res.status(400).send("Wrong username or password!");
+        resData.statusCode = 400;
+        resData.state = "FAILED";
+        resData.msg = "Wrong username or password!";
+        return res.status(resData.statusCode).json(resData);
     }
 }
 
