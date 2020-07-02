@@ -1,21 +1,16 @@
-import express, { Request, Response } from "express";
+import { Server } from "./server/Server";
 
-import rApi from "./api";
-import { PORT } from "./env";
-import models from "./model";
+class System {
+    private _server: Server;
 
-// Request Handlers ---------------------------------------------------------------------
+    public constructor() {
+        this._server = new Server(Number(process.env.PORT) || 8080);
+    }
 
-function index(req: Request, res: Response) {
-    res.send("Welcome");
+    public start() {
+        this._server.startServer();
+    }
 }
 
-//---------------------------------------------------------------------------------------
-
-const app = express();
-
-app.locals.models = models;
-app.use("/api/", rApi);
-app.get("/", index);
-
-app.listen(PORT, () => console.log(`Listening at port ${PORT}`));
+const system = new System();
+system.start();

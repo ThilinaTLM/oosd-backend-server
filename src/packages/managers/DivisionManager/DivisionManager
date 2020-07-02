@@ -1,0 +1,64 @@
+import { DatabaseService } from "../../../data/DatabaseService";
+import { Division } from "../../core/Division";
+import { MDivision } from "../../../data/entity/MDivision";
+import { IObjectPool } from "../../objectPool/IObjectPool";
+import { ObjectPool } from "../../objectPool/ObjectPool";
+
+export class DivisionManager {
+    // Singleton
+    private static _instance: DivisionManager;
+    public static get instance(): DivisionManager {
+        if (!this._instance) {
+            this._instance = new DivisionManager();
+        }
+        return this._instance;
+    }
+
+    private _divisionPool: IObjectPool<Division>;
+    private _databaseService: DatabaseService;
+
+    private constructor() {
+        this._databaseService = DatabaseService.instance;
+        this._divisionPool = new ObjectPool(20);
+    }
+
+    // private findInPool(id: number): Division
+    // private findInPool(name: string): Division
+    private findInPool(key: number | string): Division | undefined {
+        if (typeof key == "number") {
+            return this._divisionPool.findObject("id", key);
+        } else {
+            return this._divisionPool.findObject("name", key);
+        }
+    }
+
+    async getDivision(id: number): Promise<Division>
+    async getDivision(name: string): Promise<Division>
+    async getDivision(key: number | string): Promise<Division> {
+        let fromPool = this.findInPool(key);
+        if (fromPool) {
+            return fromPool;
+        }
+
+        let divData: MDivision | undefined;
+        if (typeof key == "number") {
+            divData = await this._databaseService.dataSource_divisions.getDivision_byId(key)
+        } else {
+            divData = await this._databaseService.dataSource_divisions.getDivision_byName(key);
+        }
+
+        if (!divData) {
+            return Division.NullDivision;
+        }
+        let div = new Division(divData.id, divData.name)
+        this._divisionPool.pushObject(div);
+        return div;
+    }
+
+    async createDivision(div: Division): Promise<Division> {
+        let res = await this._databaseService.dataSource_divisions.createOrUpdateDivision(div.name);
+        div.id = res.id;
+        this._divisionPool.updateObject('id', div.id, div);
+        return div;
+    }
+}
