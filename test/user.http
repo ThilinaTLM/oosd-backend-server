@@ -17,3 +17,6 @@ Content-Type: application/json
 
 ###
 POST http://localhost:8080/api/user/signup
+
+###
+GET https://www.google.com

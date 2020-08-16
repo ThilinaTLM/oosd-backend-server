@@ -1,7 +1,11 @@
-# Folders
+# dependencies and build files
 node_modules
 dist
 
-# Files
+# log files
 yarn.lock
-.env
+package-lock.json
+
+# IDE & Editors
+.vscode
+.idea
