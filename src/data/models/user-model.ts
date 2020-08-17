@@ -13,13 +13,13 @@ class UserModel implements Model {
 
     public sync = (syncer: Syncer) => {
         return {
-            byID: () => this.pull_byID(syncer)
+            // byID: () => this.pull_byID(syncer)
         };
     };
 
-    private pull_byID = async (syncer: Syncer): Promise<UserModel> => {
+    // private pull_byID = async (syncer: Syncer): Promise<UserModel> => {
 
-        return this;
-    };
+    //     return this;
+    // };
 
 }
