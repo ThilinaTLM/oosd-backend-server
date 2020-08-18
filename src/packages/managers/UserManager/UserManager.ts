@@ -1,5 +1,5 @@
 import { IUserManager } from "./IUserManager";
-import User from "../../core/User";
+import {User} from "../../core/User";
 import { DatabaseService } from "../../../data/DatabaseService";
 
 export class UserManager implements IUserManager {
