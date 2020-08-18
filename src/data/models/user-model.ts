@@ -1,6 +1,5 @@
 import { Model, Syncer } from "../index";
 import { ReturnType } from "../../extra";
-import { User } from "../../packages/core/User";
 
 class UserModel implements Model {
 
@@ -42,9 +41,9 @@ class UserModel implements Model {
     public sync = (syncer: Syncer) => {
         return {
             getByUserId: (): Promise<ReturnType<UserModel>> => this.get_byUserId(syncer),
-            save_withoutUserId: (): Promise<ReturnType<UserModel>> => this.save_withoutUserId(syncer),
-            save_withUserId: (): Promise<ReturnType<UserModel>> => this.save_withUserId(syncer),
-            delete_byUserId: (): Promise<ReturnType<UserModel>> => this.delete_byUserId(syncer)
+            saveWithoutUserId: (): Promise<ReturnType<UserModel>> => this.save_withoutUserId(syncer),
+            saveWithUserId: (): Promise<ReturnType<UserModel>> => this.save_withUserId(syncer),
+            deleteByUserId: (): Promise<ReturnType<UserModel>> => this.delete_byUserId(syncer)
         };
     };
 
@@ -54,19 +53,19 @@ class UserModel implements Model {
             return [{ code: 1, msg: "Id cannot be NULL" }, this];
 
         try {
-            const [results, fields] = await syncer.execute(
+            const [results] = await syncer.execute(
                 `SELECT DISTINCT * FROM ${this.databaseName}.${this.tableName} WHERE id = '${this.id}'`
             );
             const raw = results[0];
 
             this.id = raw.id;
-            this.firstName = raw.firstName;
-            this.lastName = raw.lastName;
+            this.firstName = raw.first_name;
+            this.lastName = raw.last_name;
             this.email = raw.email;
             this.telephone = raw.telephone;
             this.role = raw.role;
             this.permission = raw.permission;
-            this.officeID = raw.officeID;
+            this.officeID = raw.office_id;
 
             return [{ code: 0, msg: "" }, this];
 
@@ -81,11 +80,11 @@ class UserModel implements Model {
             return [{ code: 1, msg: "Essential Details cannot be NULL" }, this];
 
         try {
-            const [results, fields] = await syncer.execute(
+            const [results] = await syncer.execute(
                 `INSERT INTO ${this.databaseName}.${this.tableName}
-                    (firstName, lastName, email, telephone, role, permission, officeID)
+                    (first_name, last_name, email, telephone, role, permission, office_id)
                  VALUES
-                    ('${this.firstName}', '${this.lastName}', '${this.email}', '${this.telephone}', '${this.role}', '${this.permission}', '${this.officeID}')`
+                    ('${this.firstName}', '${this.lastName}', '${this.email}', '${this.telephone}', '${this.role}', '${this.permission}', ${this.officeID})`
             );
 
             this.id = results.insertId;
@@ -103,11 +102,11 @@ class UserModel implements Model {
             return [{ code: 1, msg: "Essential details cannot be NULL" }, this];
 
         try {
-            const [results, fields] = await syncer.execute(
+            await syncer.execute(
                 `INSERT INTO ${this.databaseName}.${this.tableName}
-                    (id, firstName, lastName, email, telephone, role, permission, officeID)
+                    (id, first_name, last_name, email, telephone, role, permission, office_id)
                  VALUES
-                    (${this.id}, ${this.firstName}', '${this.lastName}', '${this.email}', '${this.telephone}', '${this.role}', '${this.permission}', '${this.officeID}')`
+                    (${this.id}, ${this.firstName}', '${this.lastName}', '${this.email}', '${this.telephone}', '${this.role}', '${this.permission}', ${this.officeID})`
             );
 
             return [{ code: 0, msg: "" }, this];

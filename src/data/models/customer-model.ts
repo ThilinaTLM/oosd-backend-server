@@ -23,9 +23,9 @@ class CustomerModel implements Model {
     public divisionalOfficeID: number;
     public gnOffice: string;
 
-    constructor(){
+    constructor() {
         this.databaseName = "cms";
-        this.tableName = "customers"
+        this.tableName = "customers";
         this.id = CustomerModel.NULL_Id;
         this.fullName = CustomerModel.NULL_fullName;
         this.nic = CustomerModel.NULL_Nic;
@@ -37,14 +37,14 @@ class CustomerModel implements Model {
 
     }
 
-    public sync = (syncer: Syncer) =>{
-        return{
+    public sync = (syncer: Syncer) => {
+        return {
             getByUserId: (): Promise<ReturnType<CustomerModel>> => this.get_byUserId(syncer),
-            save_withoutUserId: (): Promise<ReturnType<CustomerModel>> => this.save_withoutUserId(syncer),
-            save_withUserId: (): Promise<ReturnType<CustomerModel>> => this.save_withUserId(syncer),
-            delete_byUserId: (): Promise<ReturnType<CustomerModel>> => this.delete_byUserId(syncer)
-        }
-    }
+            saveWithoutUserId: (): Promise<ReturnType<CustomerModel>> => this.save_withoutUserId(syncer),
+            saveWithUserId: (): Promise<ReturnType<CustomerModel>> => this.save_withUserId(syncer),
+            deleteByUserId: (): Promise<ReturnType<CustomerModel>> => this.delete_byUserId(syncer)
+        };
+    };
 
 
     private get_byUserId = async (syncer: Syncer): Promise<ReturnType<CustomerModel>> => {
@@ -52,19 +52,19 @@ class CustomerModel implements Model {
             return [{ code: 1, msg: "Id cannot be NULL" }, this];
 
         try {
-            const [results, fields] = await syncer.execute(
+            const [results] = await syncer.execute(
                 `SELECT DISTINCT * FROM ${this.databaseName}.${this.tableName} WHERE id = '${this.id}'`
             );
             const raw = results[0];
 
             this.id = raw.id;
-            this.fullName = raw.fullName;
+            this.fullName = raw.full_name;
             this.nic = raw.nic;
             this.email = raw.email;
             this.telephone = raw.telephone;
             this.address = raw.address;
-            this.divisionalOfficeID = raw.dsOffice;
-            this.gnOffice = raw.gnOffice;
+            this.divisionalOfficeID = raw.divisional_office_id;
+            this.gnOffice = raw.gn_office;
 
             return [{ code: 0, msg: "" }, this];
 
@@ -75,13 +75,18 @@ class CustomerModel implements Model {
     };
 
     private async save_withoutUserId(syncer: Syncer): Promise<ReturnType<CustomerModel>> {
-        if (this.fullName == CustomerModel.NULL_fullName || this.nic == CustomerModel.NULL_Nic || this.address == CustomerModel.NULL_Address || this.divisionalOfficeID == CustomerModel.NULL_DivisionalOfficeID || this.gnOffice == CustomerModel.NULL_GnOffice)
-            return [{ code: 1, msg: "Essential Details cannot be NULL" }, this];
+        if (
+            this.fullName == CustomerModel.NULL_fullName ||
+            this.nic == CustomerModel.NULL_Nic ||
+            this.address == CustomerModel.NULL_Address ||
+            this.divisionalOfficeID == CustomerModel.NULL_DivisionalOfficeID ||
+            this.gnOffice == CustomerModel.NULL_GnOffice
+        ) return [{ code: 1, msg: "Essential Details cannot be NULL" }, this];
 
         try {
-            const [results, fields] = await syncer.execute(
+            const [results] = await syncer.execute(
                 `INSERT INTO ${this.databaseName}.${this.tableName}
-                    (fullname, nic, email, telephone, address, divisionalOfficeID, gnOffice)
+                    (full_name, nic, email, telephone, address, divisional_office_id, gn_office)
                  VALUES
                     ('${this.fullName}', '${this.nic}', '${this.email}', '${this.telephone}', '${this.address}', '${this.divisionalOfficeID}', '${this.gnOffice}')`
             );
@@ -95,15 +100,20 @@ class CustomerModel implements Model {
     }
 
 
-
     private async save_withUserId(syncer: Syncer): Promise<ReturnType<CustomerModel>> {
-        if (this.id == CustomerModel.NULL_Id || this.fullName == CustomerModel.NULL_fullName || this.nic == CustomerModel.NULL_Nic || this.address == CustomerModel.NULL_Address || this.divisionalOfficeID == CustomerModel.NULL_DivisionalOfficeID || this.gnOffice == CustomerModel.NULL_GnOffice )
-            return [{ code: 1, msg: "Essential details cannot be NULL" }, this];
+        if (
+            this.id == CustomerModel.NULL_Id ||
+            this.fullName == CustomerModel.NULL_fullName ||
+            this.nic == CustomerModel.NULL_Nic ||
+            this.address == CustomerModel.NULL_Address ||
+            this.divisionalOfficeID == CustomerModel.NULL_DivisionalOfficeID ||
+            this.gnOffice == CustomerModel.NULL_GnOffice
+        ) return [{ code: 1, msg: "Essential details cannot be NULL" }, this];
 
         try {
-            const [results, fields] = await syncer.execute(
+            await syncer.execute(
                 `INSERT INTO ${this.databaseName}.${this.tableName}
-                    (id, fullname, nic, email, telephone, address, divisionalOfficeID, gnOffice)
+                    (id, full_name, nic, email, telephone, address, divisional_office_id, gn_office)
                  VALUES
                     (${this.id}, ${this.fullName}', '${this.nic}', '${this.email}', '${this.telephone}', '${this.address}', '${this.divisionalOfficeID}', '${this.gnOffice}')`
             );
@@ -134,9 +144,6 @@ class CustomerModel implements Model {
         }
 
     }
-
-
-
 
 
 }
