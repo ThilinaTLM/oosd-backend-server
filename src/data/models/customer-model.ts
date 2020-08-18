@@ -40,6 +40,7 @@ class CustomerModel implements Model {
     public sync = (syncer: Syncer) =>{
         return{
             getByUserId: (): Promise<ReturnType<CustomerModel>> => this.get_byUserId(syncer),
+            save_withoutUserId: (): Promise<ReturnType<CustomerModel>> => this.save_withoutUserId(syncer),
             save_withUserId: (): Promise<ReturnType<CustomerModel>> => this.save_withUserId(syncer),
             delete_byUserId: (): Promise<ReturnType<CustomerModel>> => this.delete_byUserId(syncer)
         }
