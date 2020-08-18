@@ -174,7 +174,7 @@ export class ComplaintModel implements Model {
 
     private async delete_byComplaintId(syncer: Syncer): Promise<ReturnType<ComplaintModel>> {
         if (this.id == ComplaintModel.NULL_Id)
-            return [{ code: 1, msg: "userId cannot be NULL" }, this];
+            return [{ code: 1, msg: "ComplaintId cannot be NULL" }, this];
 
         try {
             await syncer.execute(

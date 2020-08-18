@@ -128,7 +128,7 @@ class CustomerModel implements Model {
 
     private async delete_byCustomerId(syncer: Syncer): Promise<ReturnType<CustomerModel>> {
         if (this.id == CustomerModel.NULL_Id)
-            return [{ code: 1, msg: "userId cannot be NULL" }, this];
+            return [{ code: 1, msg: "CustomerId cannot be NULL" }, this];
 
         try {
             await syncer.execute(
