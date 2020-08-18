@@ -16,7 +16,6 @@ export interface IComplaintModel {
     assignedDate: Date;
     currentState: number;
     log: object;
-
 }
 
 
@@ -73,15 +72,15 @@ export class ComplaintModel implements Model {
 
     public sync = (syncer: Syncer) => {
         return {
-            getByUserId: (): Promise<ReturnType<ComplaintModel>> => this.get_byUserId(syncer),
-            saveWithoutUserId: (): Promise<ReturnType<ComplaintModel>> => this.save_withoutUserId(syncer),
-            saveWithUserId: (): Promise<ReturnType<ComplaintModel>> => this.save_withUserId(syncer),
-            deleteByUserId: (): Promise<ReturnType<ComplaintModel>> => this.delete_byUserId(syncer)
+            getByComplaintId: (): Promise<ReturnType<ComplaintModel>> => this.get_byComplaintId(syncer),
+            saveWithoutComplaintId: (): Promise<ReturnType<ComplaintModel>> => this.save_withoutComplaintId(syncer),
+            saveWithComplaintId: (): Promise<ReturnType<ComplaintModel>> => this.save_withComplaintId(syncer),
+            deleteByComplaintId: (): Promise<ReturnType<ComplaintModel>> => this.delete_byComplaintId(syncer)
         };
     };
 
 
-    private get_byUserId = async (syncer: Syncer): Promise<ReturnType<ComplaintModel>> => {
+    private get_byComplaintId = async (syncer: Syncer): Promise<ReturnType<ComplaintModel>> => {
         if (this.id == ComplaintModel.NULL_Id)
             return [{ code: 1, msg: "Id cannot be NULL" }, this];
 
@@ -113,7 +112,7 @@ export class ComplaintModel implements Model {
         }
     };
 
-    private async save_withoutUserId(syncer: Syncer): Promise<ReturnType<ComplaintModel>> {
+    private async save_withoutComplaintId(syncer: Syncer): Promise<ReturnType<ComplaintModel>> {
         if (
             this.referenceNumber == ComplaintModel.NULL_referenceNumber ||
             this.origin == ComplaintModel.NULL_Origin ||
@@ -143,7 +142,7 @@ export class ComplaintModel implements Model {
     }
 
 
-    private async save_withUserId(syncer: Syncer): Promise<ReturnType<ComplaintModel>> {
+    private async save_withComplaintId(syncer: Syncer): Promise<ReturnType<ComplaintModel>> {
         if (
             this.id == ComplaintModel.NULL_Id ||
             this.referenceNumber == ComplaintModel.NULL_referenceNumber ||
@@ -173,7 +172,7 @@ export class ComplaintModel implements Model {
         }
     }
 
-    private async delete_byUserId(syncer: Syncer): Promise<ReturnType<ComplaintModel>> {
+    private async delete_byComplaintId(syncer: Syncer): Promise<ReturnType<ComplaintModel>> {
         if (this.id == ComplaintModel.NULL_Id)
             return [{ code: 1, msg: "userId cannot be NULL" }, this];
 
