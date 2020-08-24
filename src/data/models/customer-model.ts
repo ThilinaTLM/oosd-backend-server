@@ -39,15 +39,15 @@ class CustomerModel implements Model {
 
     public sync = (syncer: Syncer) => {
         return {
-            getByUserId: (): Promise<ReturnType<CustomerModel>> => this.get_byUserId(syncer),
-            saveWithoutUserId: (): Promise<ReturnType<CustomerModel>> => this.save_withoutUserId(syncer),
-            saveWithUserId: (): Promise<ReturnType<CustomerModel>> => this.save_withUserId(syncer),
-            deleteByUserId: (): Promise<ReturnType<CustomerModel>> => this.delete_byUserId(syncer)
+            getByCustomerId: (): Promise<ReturnType<CustomerModel>> => this.get_byCustomerId(syncer),
+            saveWithoutCustomerId: (): Promise<ReturnType<CustomerModel>> => this.save_withoutCustomerId(syncer),
+            saveWithUCustomerId: (): Promise<ReturnType<CustomerModel>> => this.save_withCustomerId(syncer),
+            deleteByCustomerId: (): Promise<ReturnType<CustomerModel>> => this.delete_byCustomerId(syncer)
         };
     };
 
 
-    private get_byUserId = async (syncer: Syncer): Promise<ReturnType<CustomerModel>> => {
+    private get_byCustomerId = async (syncer: Syncer): Promise<ReturnType<CustomerModel>> => {
         if (this.id == CustomerModel.NULL_Id)
             return [{ code: 1, msg: "Id cannot be NULL" }, this];
 
@@ -74,7 +74,7 @@ class CustomerModel implements Model {
         }
     };
 
-    private async save_withoutUserId(syncer: Syncer): Promise<ReturnType<CustomerModel>> {
+    private async save_withoutCustomerId(syncer: Syncer): Promise<ReturnType<CustomerModel>> {
         if (
             this.fullName == CustomerModel.NULL_fullName ||
             this.nic == CustomerModel.NULL_Nic ||
@@ -100,7 +100,7 @@ class CustomerModel implements Model {
     }
 
 
-    private async save_withUserId(syncer: Syncer): Promise<ReturnType<CustomerModel>> {
+    private async save_withCustomerId(syncer: Syncer): Promise<ReturnType<CustomerModel>> {
         if (
             this.id == CustomerModel.NULL_Id ||
             this.fullName == CustomerModel.NULL_fullName ||
@@ -126,7 +126,7 @@ class CustomerModel implements Model {
         }
     }
 
-    private async delete_byUserId(syncer: Syncer): Promise<ReturnType<CustomerModel>> {
+    private async delete_byCustomerId(syncer: Syncer): Promise<ReturnType<CustomerModel>> {
         if (this.id == CustomerModel.NULL_Id)
             return [{ code: 1, msg: "userId cannot be NULL" }, this];
 
