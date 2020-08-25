@@ -1,7 +1,18 @@
 import { Model, Syncer } from "../index";
 import { ReturnType } from "../../extra";
 
-class CustomerModel implements Model {
+export interface ICustomerData {
+     id: number;
+     fullName: string;
+     nic: string;
+     email: string;
+     telephone: string;
+     address: string;
+     divisionalOfficeID: number;
+     gnOfficeID: string;
+}
+
+class CustomerModel implements Model, ICustomerData {
 
     public static readonly NULL_Id = -1;
     public static readonly NULL_fullName = "";
@@ -21,7 +32,7 @@ class CustomerModel implements Model {
     public telephone: string;
     public address: string;
     public divisionalOfficeID: number;
-    public gnOffice: string;
+    public gnOfficeID: string;
 
     constructor() {
         this.databaseName = "cms";
@@ -33,7 +44,7 @@ class CustomerModel implements Model {
         this.telephone = CustomerModel.NULL_Telephone;
         this.address = CustomerModel.NULL_Address;
         this.divisionalOfficeID = CustomerModel.NULL_DivisionalOfficeID;
-        this.gnOffice = CustomerModel.NULL_GnOffice;
+        this.gnOfficeID = CustomerModel.NULL_GnOffice;
 
     }
 
@@ -64,7 +75,7 @@ class CustomerModel implements Model {
             this.telephone = raw.telephone;
             this.address = raw.address;
             this.divisionalOfficeID = raw.divisional_office_id;
-            this.gnOffice = raw.gn_office;
+            this.gnOfficeID = raw.gn_office_id;
 
             return [{ code: 0, msg: "" }, this];
 
@@ -80,15 +91,17 @@ class CustomerModel implements Model {
             this.nic == CustomerModel.NULL_Nic ||
             this.address == CustomerModel.NULL_Address ||
             this.divisionalOfficeID == CustomerModel.NULL_DivisionalOfficeID ||
-            this.gnOffice == CustomerModel.NULL_GnOffice
+            this.gnOfficeID == CustomerModel.NULL_GnOffice
         ) return [{ code: 1, msg: "Essential Details cannot be NULL" }, this];
 
         try {
             const [results] = await syncer.execute(
                 `INSERT INTO ${this.databaseName}.${this.tableName}
-                    (full_name, nic, email, telephone, address, divisional_office_id, gn_office)
+                    (full_name, nic, email, telephone, address, divisional_office_id, gn_office_id)
                  VALUES
-                    ('${this.fullName}', '${this.nic}', '${this.email}', '${this.telephone}', '${this.address}', '${this.divisionalOfficeID}', '${this.gnOffice}')`
+                    ('${this.fullName}', '${this.nic}', '${this.email}', 
+                    '${this.telephone}', '${this.address}', ${this.divisionalOfficeID}, 
+                    ${this.gnOfficeID})`
             );
 
             this.id = results.insertId;
@@ -107,15 +120,17 @@ class CustomerModel implements Model {
             this.nic == CustomerModel.NULL_Nic ||
             this.address == CustomerModel.NULL_Address ||
             this.divisionalOfficeID == CustomerModel.NULL_DivisionalOfficeID ||
-            this.gnOffice == CustomerModel.NULL_GnOffice
+            this.gnOfficeID == CustomerModel.NULL_GnOffice
         ) return [{ code: 1, msg: "Essential details cannot be NULL" }, this];
 
         try {
             await syncer.execute(
                 `INSERT INTO ${this.databaseName}.${this.tableName}
-                    (id, full_name, nic, email, telephone, address, divisional_office_id, gn_office)
+                    (id, full_name, nic, email, telephone, address, divisional_office_id, gn_office_id)
                  VALUES
-                    (${this.id}, ${this.fullName}', '${this.nic}', '${this.email}', '${this.telephone}', '${this.address}', '${this.divisionalOfficeID}', '${this.gnOffice}')`
+                    (${this.id}, ${this.fullName}', '${this.nic}', '${this.email}', 
+                    '${this.telephone}', '${this.address}', ${this.divisionalOfficeID}, 
+                    ${this.gnOfficeID})`
             );
 
             return [{ code: 0, msg: "" }, this];

@@ -4,10 +4,10 @@
     "description": "Backend Server : Galle district secretariat office complaint management system",
     "main": "src/main.ts",
     "scripts": {
-        "dev": "ts-node src/main.ts",
         "build": "tsc",
         "start": "node dist/main.js",
-        "migrate": "ts-node ./migrate.ts"
+        "dev": "ts-node src/main.ts",
+        "migrate": "ts-node ./src/data/migration/migrate.ts"
     },
     "author": "Thilina Lakshan (TLM)",
     "license": "MIT",

@@ -1,5 +1,6 @@
+import { exec } from 'child_process';
 import mysql from "mysql2/promise";
-import { ReturnType } from "../extra";
+import { ErrorType, ReturnType } from "../extra";
 
 const mysql_Config = {
     host: process.env.mysql_host || "localhost",
@@ -16,14 +17,16 @@ export interface Model {
 
 export interface Syncer {
     execute: Function;
+    sqlFile(file: string): Promise<string>;
 }
 
-class MysqlSyncer {
+class MysqlSyncer implements Syncer {
     private _pool: mysql.Pool;
 
     private constructor() {
         this._pool = mysql.createPool(mysql_Config);
     }
+
 
     // singleton
     private static _instance: MysqlSyncer;
@@ -40,6 +43,17 @@ class MysqlSyncer {
         return poolConn.execute(sql);
     }
 
+    sqlFile(filePath: string): Promise<string> {
+        return new Promise<string>((resolve, reject) => {
+            const command = `mysql -u ${mysql_Config.user} -p${mysql_Config.password} < '${filePath}'`;
+            exec(command, (error, stdout) => {
+                if (error) {
+                    reject(error.message)
+                }
+                resolve(stdout)
+            });
+        })
+    }
 }
 
 export const mysqlSyncer = MysqlSyncer.instance;

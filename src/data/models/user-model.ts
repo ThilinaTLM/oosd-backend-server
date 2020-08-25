@@ -1,7 +1,17 @@
 import { Model, Syncer } from "../index";
 import { ReturnType } from "../../extra";
 
-class UserModel implements Model {
+export interface IUserData {
+    id: number;
+    firstName: string;
+    lastName: string;
+    email: string;
+    telephone: string;
+    role: number;
+    officeID: number;
+}
+
+export class UserModel implements Model, IUserData {
 
     public static readonly NULL_Id = -1;
     public static readonly NULL_firstName = "";
@@ -9,7 +19,6 @@ class UserModel implements Model {
     public static readonly NULL_email = "";
     public static readonly NULL_telephone = "";
     public static readonly NULL_role = -1;
-    public static readonly NULL_permission = -1;
     public static readonly NULL_officeID = -1;
 
     public readonly databaseName: string;
@@ -20,11 +29,10 @@ class UserModel implements Model {
     public email: string;
     public telephone: string;
     public role: number;
-    public permission: number;
     public officeID: number;
 
 
-    constructor(){
+    constructor() {
         this.databaseName = "cms";
         this.tableName = "users";
         this.id = UserModel.NULL_Id;
@@ -33,7 +41,6 @@ class UserModel implements Model {
         this.email = UserModel.NULL_email;
         this.telephone = UserModel.NULL_telephone;
         this.role = UserModel.NULL_role;
-        this.permission = UserModel.NULL_permission;
         this.officeID = UserModel.NULL_officeID;
     }
 
@@ -47,7 +54,7 @@ class UserModel implements Model {
         };
     };
 
-    
+
     private get_byUserId = async (syncer: Syncer): Promise<ReturnType<UserModel>> => {
         if (this.id == UserModel.NULL_Id)
             return [{ code: 1, msg: "Id cannot be NULL" }, this];
@@ -63,8 +70,7 @@ class UserModel implements Model {
             this.lastName = raw.last_name;
             this.email = raw.email;
             this.telephone = raw.telephone;
-            this.role = raw.role;
-            this.permission = raw.permission;
+            this.role = Number(raw.role);
             this.officeID = raw.office_id;
 
             return [{ code: 0, msg: "" }, this];
@@ -76,15 +82,20 @@ class UserModel implements Model {
     };
 
     private async save_withoutUserId(syncer: Syncer): Promise<ReturnType<UserModel>> {
-        if (this.firstName == UserModel.NULL_firstName || this.lastName == UserModel.NULL_lastName || this.email == UserModel.NULL_email || this.telephone == UserModel.NULL_telephone || this.role == UserModel.NULL_role || this.permission ==UserModel.NULL_permission || this.officeID == UserModel.NULL_officeID )
-            return [{ code: 1, msg: "Essential Details cannot be NULL" }, this];
+        if (this.firstName == UserModel.NULL_firstName ||
+            this.lastName == UserModel.NULL_lastName ||
+            this.email == UserModel.NULL_email ||
+            this.telephone == UserModel.NULL_telephone ||
+            this.role == UserModel.NULL_role ||
+            this.officeID == UserModel.NULL_officeID
+        ) return [{ code: 1, msg: "Essential Details cannot be NULL" }, this];
 
         try {
             const [results] = await syncer.execute(
                 `INSERT INTO ${this.databaseName}.${this.tableName}
-                    (first_name, last_name, email, telephone, role, permission, office_id)
+                    (first_name, last_name, email, telephone, role, office_id)
                  VALUES
-                    ('${this.firstName}', '${this.lastName}', '${this.email}', '${this.telephone}', '${this.role}', '${this.permission}', ${this.officeID})`
+                    ('${this.firstName}', '${this.lastName}', '${this.email}', '${this.telephone}', '${this.role}', ${this.officeID})`
             );
 
             this.id = results.insertId;
@@ -96,17 +107,24 @@ class UserModel implements Model {
     }
 
 
-
     private async save_withUserId(syncer: Syncer): Promise<ReturnType<UserModel>> {
-        if (this.id == UserModel.NULL_Id || this.firstName == UserModel.NULL_firstName || this.lastName == UserModel.NULL_lastName || this.email == UserModel.NULL_email || this.telephone == UserModel.NULL_telephone || this.role == UserModel.NULL_role || this.permission == UserModel.NULL_permission || this.officeID == UserModel.NULL_officeID )
-            return [{ code: 1, msg: "Essential details cannot be NULL" }, this];
+        if (this.id == UserModel.NULL_Id ||
+            this.firstName == UserModel.NULL_firstName ||
+            this.lastName == UserModel.NULL_lastName ||
+            this.email == UserModel.NULL_email ||
+            this.telephone == UserModel.NULL_telephone ||
+            this.role == UserModel.NULL_role ||
+            this.officeID == UserModel.NULL_officeID
+        ) return [{ code: 1, msg: "Essential details cannot be NULL" }, this];
 
         try {
             await syncer.execute(
                 `INSERT INTO ${this.databaseName}.${this.tableName}
                     (id, first_name, last_name, email, telephone, role, permission, office_id)
                  VALUES
-                    (${this.id}, ${this.firstName}', '${this.lastName}', '${this.email}', '${this.telephone}', '${this.role}', '${this.permission}', ${this.officeID})`
+                    (${this.id}, ${this.firstName}', '${this.lastName}', 
+                    '${this.email}', '${this.telephone}', '${this.role}', 
+                    ${this.officeID})`
             );
 
             return [{ code: 0, msg: "" }, this];
@@ -135,14 +153,5 @@ class UserModel implements Model {
         }
 
     }
-
-
-
-
-
-
-
-
-
 
 }
