@@ -1,3 +1,4 @@
+require('dotenv').config()
 import { Server } from "./server/server";
 
 const PORT = Number(process.env.PORT) || 8080

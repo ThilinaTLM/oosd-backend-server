@@ -1,13 +1,13 @@
-import { exec } from 'child_process';
+import { exec } from "child_process";
 import mysql from "mysql2/promise";
-import { ErrorType, ReturnType } from "../extra";
+import { ReturnType } from "../extra";
 
 const mysql_Config = {
-    host: process.env.mysql_host || "localhost",
-    user: process.env.mysql_user || "root",
-    password: process.env.mysql_user_password || "TLM98@mysql",
+    host: process.env.MYSQL_HOST,
+    user: process.env.MYSQL_USER,
+    password: process.env.MYSQL_USER_PASSWORD,
     waitForConnections: true,
-    connectionLimit: Number(process.env.mysql_connection_limit) || 20,
+    connectionLimit: Number(process.env.MYSQL_CONNECTION_LIMIT),
     queueLimit: 0
 };
 
@@ -17,7 +17,6 @@ export interface Model {
 
 export interface Syncer {
     execute: Function;
-    sqlFile(file: string): Promise<string>;
 }
 
 class MysqlSyncer implements Syncer {
@@ -26,7 +25,6 @@ class MysqlSyncer implements Syncer {
     private constructor() {
         this._pool = mysql.createPool(mysql_Config);
     }
-
 
     // singleton
     private static _instance: MysqlSyncer;
@@ -42,18 +40,10 @@ class MysqlSyncer implements Syncer {
         const poolConn = await this._pool.getConnection();
         return poolConn.execute(sql);
     }
-
-    sqlFile(filePath: string): Promise<string> {
-        return new Promise<string>((resolve, reject) => {
-            const command = `mysql -u ${mysql_Config.user} -p${mysql_Config.password} < '${filePath}'`;
-            exec(command, (error, stdout) => {
-                if (error) {
-                    reject(error.message)
-                }
-                resolve(stdout)
-            });
-        })
-    }
 }
 
 export const mysqlSyncer = MysqlSyncer.instance;
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+

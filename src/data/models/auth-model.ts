@@ -1,5 +1,6 @@
 import { Model, Syncer } from "../index";
 import { ReturnType } from "../../extra";
+import { ModelError } from "../../packages/errors/err-model";
 
 export interface IAuthData {
     userId?: number;
@@ -10,6 +11,12 @@ export interface IAuthData {
 }
 
 export class AuthModel implements Model, IAuthData {
+
+    static sync(syncer: Syncer) {
+        return {
+            hello: () => console.log("Hello")
+        }
+    }
 
     public static readonly NULL_userId = -1;
     public static readonly NULL_username = "";
@@ -38,23 +45,24 @@ export class AuthModel implements Model, IAuthData {
     public sync(syncer: Syncer) {
         return {
             getByUsername: (): Promise<ReturnType<AuthModel>> => this.get_byUsername(syncer),
-            getByUserId: (): Promise<ReturnType<AuthModel>> => this.get_byUserId(syncer),
-            saveWithoutUserId: (): Promise<ReturnType<AuthModel>> => this.save_withoutUserId(syncer),
-            saveWithUserId: (): Promise<ReturnType<AuthModel>> => this.save_withUserId(syncer),
-            deleteByUserId: (): Promise<ReturnType<AuthModel>> => this.delete_byUserId(syncer),
+            getByUserID: (): Promise<ReturnType<AuthModel>> => this.get_byUserID(syncer),
+            saveWithoutUserID: (): Promise<ReturnType<AuthModel>> => this.save_withoutUserId(syncer),
+            saveWithUserID: (): Promise<ReturnType<AuthModel>> => this.save_withUserId(syncer),
+            deleteByUserID: (): Promise<ReturnType<AuthModel>> => this.delete_byUserId(syncer),
             deleteByUsername: (): Promise<ReturnType<AuthModel>> => this.delete_byUsername(syncer)
         };
     };
 
     private get_byUsername = async (syncer: Syncer): Promise<ReturnType<AuthModel>> => {
         if (this.username == AuthModel.NULL_username) {
-            return [{ code: 1, msg: "username cannot be NULL" }, this];
+            return [ModelError.KEY_IS_NULL, this];
         }
 
         try {
             const [results] = await syncer.execute(
                 `SELECT DISTINCT * FROM ${this.databaseName}.${this.tableName} WHERE username = '${this.username}'`
             );
+
             const raw = results[0];
 
             this.userId = raw.user_id;
@@ -63,17 +71,20 @@ export class AuthModel implements Model, IAuthData {
             this.active = raw.active;
             this.permissionCode = raw.permission_code;
 
-            return [{ code: 0, msg: "" }, this];
+            return [ModelError.NO_ERRORS, this];
 
         } catch (e) {
-            console.log("[SQL][ERROR]:", e.sqlMessage);
-            return [{ code: 2, msg: e.sqlMessage }, this];
+            if (e instanceof TypeError) {
+                return [ ModelError.ENTRY_NOT_FOUND , this];
+            } else {
+                return [ModelError.SQL_ERROR, this];
+            }
         }
     };
 
-    private get_byUserId = async (syncer: Syncer): Promise<ReturnType<AuthModel>> => {
+    private get_byUserID = async (syncer: Syncer): Promise<ReturnType<AuthModel>> => {
         if (this.userId == AuthModel.NULL_userId)
-            return [{ code: 1, msg: "userId cannot be NULL" }, this];
+            return [ModelError.KEY_IS_NULL, this];
 
         try {
             const [results] = await syncer.execute(
@@ -87,17 +98,20 @@ export class AuthModel implements Model, IAuthData {
             this.active = raw.active;
             this.permissionCode = raw.permission_code;
 
-            return [{ code: 0, msg: "" }, this];
+            return [ModelError.NO_ERRORS, this];
 
         } catch (e) {
-            console.log("[SQL][ERROR]:", e.sqlMessage);
-            return [{ code: 2, msg: e.sqlMessage }, this];
+            if (e instanceof TypeError) {
+                return [ ModelError.ENTRY_NOT_FOUND , this];
+            } else {
+                return [ModelError.SQL_ERROR, this];
+            }
         }
     };
 
     private async save_withoutUserId(syncer: Syncer): Promise<ReturnType<AuthModel>> {
         if (this.username == AuthModel.NULL_username || this.hash == AuthModel.NULL_hash)
-            return [{ code: 1, msg: "username or hash cannot be NULL" }, this];
+            return [ModelError.ESSENTIALS_ARE_NULL, this];
 
         try {
             const [results] = await syncer.execute(
@@ -108,16 +122,15 @@ export class AuthModel implements Model, IAuthData {
             );
 
             this.userId = results.insertId;
-            return [{ code: 0, msg: "" }, this];
+            return [ModelError.NO_ERRORS, this];
         } catch (e) {
-            console.log("[SQL][ERROR]:", e.sqlMessage);
-            return [{ code: 2, msg: e.sqlMessage }, this];
+            return [ModelError.SQL_ERROR, this];
         }
     }
 
     private async save_withUserId(syncer: Syncer): Promise<ReturnType<AuthModel>> {
         if (this.userId == AuthModel.NULL_userId || this.username == AuthModel.NULL_username || this.hash == AuthModel.NULL_hash)
-            return [{ code: 1, msg: "userId or username or hash cannot be NULL" }, this];
+            return [ModelError.ESSENTIALS_ARE_NULL, this];
 
         try {
             await syncer.execute(
@@ -127,17 +140,16 @@ export class AuthModel implements Model, IAuthData {
                     (${this.userId}, ${this.username}', '${this.hash}', '${this.active}', ${this.permissionCode})`
             );
 
-            return [{ code: 0, msg: "" }, this];
+            return [ModelError.NO_ERRORS, this];
 
         } catch (e) {
-            console.log("[SQL][ERROR]:", e.sqlMessage);
-            return [{ code: 2, msg: e.sqlMessage }, this];
+            return [ModelError.SQL_ERROR, this];
         }
     }
 
     private async delete_byUserId(syncer: Syncer): Promise<ReturnType<AuthModel>> {
         if (this.userId == AuthModel.NULL_userId)
-            return [{ code: 1, msg: "userId cannot be NULL" }, this];
+            return [ModelError.KEY_IS_NULL, this];
 
         try {
             await syncer.execute(
@@ -146,28 +158,27 @@ export class AuthModel implements Model, IAuthData {
             );
             this.userId = AuthModel.NULL_userId;
 
-            return [{ code: 0, msg: "" }, this];
+            return [ModelError.NO_ERRORS, this];
         } catch (e) {
             console.log("[SQL][ERROR]:", e.sqlMessage);
-            return [{ code: 2, msg: e.sqlMessage }, this];
+            return [ModelError.SQL_ERROR, this];
         }
 
     }
 
     private async delete_byUsername(syncer: Syncer): Promise<ReturnType<AuthModel>> {
         if (this.username == AuthModel.NULL_username)
-            return [{ code: 1, msg: "username cannot be NULL" }, this];
+            return [ModelError.KEY_IS_NULL, this];
         try {
             await syncer.execute(
                 `DELETE FROM ${this.databaseName}.${this.tableName}
                     WHERE username = '${this.username}'`
             );
             this.username = AuthModel.NULL_username;
-            return [{ code: 0, msg: "" }, this];
+            return [ModelError.NO_ERRORS, this];
 
         } catch (e) {
-            console.log("[SQL][ERROR]:", e.sqlMessage);
-            return [{ code: 2, msg: e.sqlMessage }, this];
+            return [ModelError.SQL_ERROR, this];
         }
     };
 

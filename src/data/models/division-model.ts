@@ -1,9 +1,9 @@
 import { Model, Syncer } from "../index";
 import { ReturnType } from "../../extra";
+import { ModelError } from "../../packages/errors/err-model";
 
-
-export interface IDivisionModel{
-    id:number;
+export interface IDivisionModel {
+    id: number;
     divisionName: string;
 }
 
@@ -12,13 +12,13 @@ export class DivisionModel implements Model {
 
     public static readonly NULL_Id = -1;
     public static readonly NULL_divisionName = "";
-    
+
     public readonly databaseName: string;
     public readonly tableName: string;
     public id: number;
     public divisionName: string;
 
-    constructor(){
+    constructor() {
         this.databaseName = "cms";
         this.tableName = "divisional_offices";
         this.id = DivisionModel.NULL_Id;
@@ -33,10 +33,10 @@ export class DivisionModel implements Model {
             deleteByDivisionId: (): Promise<ReturnType<DivisionModel>> => this.delete_byDivisionId(syncer)
         };
     };
- 
+
     private get_byDivisionId = async (syncer: Syncer): Promise<ReturnType<DivisionModel>> => {
         if (this.id == DivisionModel.NULL_Id)
-            return [{ code: 1, msg: "Id cannot be NULL" }, this];
+            return [ModelError.KEY_IS_NULL, this];
 
         try {
             const [results] = await syncer.execute(
@@ -46,18 +46,20 @@ export class DivisionModel implements Model {
 
             this.id = raw.id;
             this.divisionName = raw.division_name;
-            
-            return [{ code: 0, msg: "" }, this];
+            return [ModelError.NO_ERRORS, this];
 
         } catch (e) {
-            console.log("[SQL][ERROR]:", e.sqlMessage);
-            return [{ code: 2, msg: e.sqlMessage }, this];
+            if (e instanceof TypeError) {
+                return [ModelError.ENTRY_NOT_FOUND, this];
+            } else {
+                return [ModelError.SQL_ERROR, this];
+            }
         }
     };
 
     private async save_withoutDivisionId(syncer: Syncer): Promise<ReturnType<DivisionModel>> {
-        if ( this.divisionName == DivisionModel.NULL_divisionName )
-            return [{ code: 1, msg: "Essential Details cannot be NULL" }, this];
+        if (this.divisionName == DivisionModel.NULL_divisionName)
+            return [ModelError.ESSENTIALS_ARE_NULL, this];
 
         try {
             const [results] = await syncer.execute(
@@ -68,16 +70,15 @@ export class DivisionModel implements Model {
             );
 
             this.id = results.insertId;
-            return [{ code: 0, msg: "" }, this];
+            return [ModelError.NO_ERRORS, this];
         } catch (e) {
-            console.log("[SQL][ERROR]:", e.sqlMessage);
-            return [{ code: 2, msg: e.sqlMessage }, this];
+            return [ModelError.SQL_ERROR, this];
         }
     }
 
     private async save_withDivisionId(syncer: Syncer): Promise<ReturnType<DivisionModel>> {
-        if (this.id == DivisionModel.NULL_Id || this.divisionName == DivisionModel.NULL_divisionName )
-            return [{ code: 1, msg: "Essential details cannot be NULL" }, this];
+        if (this.id == DivisionModel.NULL_Id || this.divisionName == DivisionModel.NULL_divisionName)
+            return [ModelError.ESSENTIALS_ARE_NULL, this];
 
         try {
             await syncer.execute(
@@ -87,17 +88,16 @@ export class DivisionModel implements Model {
                     (${this.id}, ${this.divisionName}')`
             );
 
-            return [{ code: 0, msg: "" }, this];
+            return [ModelError.NO_ERRORS, this];
 
         } catch (e) {
-            console.log("[SQL][ERROR]:", e.sqlMessage);
-            return [{ code: 2, msg: e.sqlMessage }, this];
+            return [ModelError.SQL_ERROR, this];
         }
     }
 
     private async delete_byDivisionId(syncer: Syncer): Promise<ReturnType<DivisionModel>> {
         if (this.id == DivisionModel.NULL_Id)
-            return [{ code: 1, msg: "DivisionID cannot be NULL" }, this];
+            return [ModelError.KEY_IS_NULL, this];
 
         try {
             await syncer.execute(
@@ -106,10 +106,9 @@ export class DivisionModel implements Model {
             );
             this.id = DivisionModel.NULL_Id;
 
-            return [{ code: 0, msg: "" }, this];
+            return [ModelError.NO_ERRORS, this];
         } catch (e) {
-            console.log("[SQL][ERROR]:", e.sqlMessage);
-            return [{ code: 2, msg: e.sqlMessage }, this];
+            return [ModelError.SQL_ERROR, this];
         }
 
     }

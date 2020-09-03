@@ -1,13 +1,14 @@
 import { Model, Syncer } from "../index";
 import { ReturnType } from "../../extra";
+import { ModelError } from "../../packages/errors/err-model";
 
 
 export interface IComplaintModel {
-    id : number;
+    id: number;
     referenceNumber: number;
     origin: string;
     assignTo: number;
-    submotTo: number;
+    submitTo: number;
     customer: number;
     subject: String;
     description: string;
@@ -33,7 +34,7 @@ export class ComplaintModel implements Model {
     public static readonly NULL_createdDate = new Date("1990-01-01T00:00:00");
     public static readonly NULL_assignedDate = new Date("1990-01-01T00:00:00");
     public static readonly NULL_currentState = -1;
-    public static readonly NULL_Log = {"null":"null"};
+    public static readonly NULL_Log = { "null": "null" };
 
     public readonly databaseName: string;
     public readonly tableName: string;
@@ -82,7 +83,7 @@ export class ComplaintModel implements Model {
 
     private get_byComplaintId = async (syncer: Syncer): Promise<ReturnType<ComplaintModel>> => {
         if (this.id == ComplaintModel.NULL_Id)
-            return [{ code: 1, msg: "Id cannot be NULL" }, this];
+            return [ModelError.KEY_IS_NULL, this];
 
         try {
             const [results] = await syncer.execute(
@@ -104,11 +105,10 @@ export class ComplaintModel implements Model {
             this.currentState = raw.current_state;
             this.log = raw.log;
 
-            return [{ code: 0, msg: "" }, this];
+            return [ModelError.NO_ERRORS, this];
 
         } catch (e) {
-            console.log("[SQL][ERROR]:", e.sqlMessage);
-            return [{ code: 2, msg: e.sqlMessage }, this];
+            return [ModelError.SQL_ERROR, this];
         }
     };
 
@@ -123,7 +123,7 @@ export class ComplaintModel implements Model {
             this.currentState == ComplaintModel.NULL_currentState ||
             this.log == ComplaintModel.NULL_Log
 
-        ) return [{ code: 1, msg: "Essential Details cannot be NULL" }, this];
+        ) return [ModelError.ESSENTIALS_ARE_NULL, this];
 
         try {
             const [results] = await syncer.execute(
@@ -134,10 +134,9 @@ export class ComplaintModel implements Model {
             );
 
             this.id = results.insertId;
-            return [{ code: 0, msg: "" }, this];
+            return [ModelError.NO_ERRORS, this];
         } catch (e) {
-            console.log("[SQL][ERROR]:", e.sqlMessage);
-            return [{ code: 2, msg: e.sqlMessage }, this];
+            return [ModelError.SQL_ERROR, this];
         }
     }
 
@@ -154,7 +153,7 @@ export class ComplaintModel implements Model {
             this.currentState == ComplaintModel.NULL_currentState ||
             this.log == ComplaintModel.NULL_Log
 
-        ) return [{ code: 1, msg: "Essential details cannot be NULL" }, this];
+        ) return [ModelError.ESSENTIALS_ARE_NULL, this];
 
         try {
             await syncer.execute(
@@ -164,17 +163,16 @@ export class ComplaintModel implements Model {
                     (${this.id}, '${this.referenceNumber}', '${this.origin}', '${this.assignTo}', '${this.submitBy}', '${this.customer}', '${this.subject}', '${this.description}', '${this.attachments}')`
             );
 
-            return [{ code: 0, msg: "" }, this];
+            return [ModelError.NO_ERRORS, this];
 
         } catch (e) {
-            console.log("[SQL][ERROR]:", e.sqlMessage);
-            return [{ code: 2, msg: e.sqlMessage }, this];
+            return [ModelError.SQL_ERROR, this];
         }
     }
 
     private async delete_byComplaintId(syncer: Syncer): Promise<ReturnType<ComplaintModel>> {
         if (this.id == ComplaintModel.NULL_Id)
-            return [{ code: 1, msg: "ComplaintId cannot be NULL" }, this];
+            return [ModelError.KEY_IS_NULL, this];
 
         try {
             await syncer.execute(
@@ -183,10 +181,9 @@ export class ComplaintModel implements Model {
             );
             this.id = ComplaintModel.NULL_Id;
 
-            return [{ code: 0, msg: "" }, this];
+            return [ModelError.NO_ERRORS, this];
         } catch (e) {
-            console.log("[SQL][ERROR]:", e.sqlMessage);
-            return [{ code: 2, msg: e.sqlMessage }, this];
+            return [ModelError.SQL_ERROR, this];
         }
 
     }

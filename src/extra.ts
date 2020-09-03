@@ -1,9 +1,10 @@
 
+// types
 
-export interface ErrorType {
-    code: 0 | number, // 0 means no error
-    msg: string
+export interface ErrorType extends String{}
+
+export type ReturnType<T> = [ErrorType, T];
+
+export interface ErrorSet {
+    [key: string]: ErrorType
 }
-
-
-export type ReturnType<T> = [ErrorType, T]

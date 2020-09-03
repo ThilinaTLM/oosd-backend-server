@@ -1,5 +1,6 @@
 import { Model, Syncer } from "../index";
 import { ReturnType } from "../../extra";
+import { ModelError } from "../../packages/errors/err-model";
 
 export interface IUserData {
     id: number;
@@ -47,17 +48,17 @@ export class UserModel implements Model, IUserData {
 
     public sync = (syncer: Syncer) => {
         return {
-            getByUserId: (): Promise<ReturnType<UserModel>> => this.get_byUserId(syncer),
-            saveWithoutUserId: (): Promise<ReturnType<UserModel>> => this.save_withoutUserId(syncer),
-            saveWithUserId: (): Promise<ReturnType<UserModel>> => this.save_withUserId(syncer),
-            deleteByUserId: (): Promise<ReturnType<UserModel>> => this.delete_byUserId(syncer)
+            getByUserID: (): Promise<ReturnType<UserModel>> => this.get_byUserId(syncer),
+            saveWithoutUserID: (): Promise<ReturnType<UserModel>> => this.save_withoutUserId(syncer),
+            saveWithUserID: (): Promise<ReturnType<UserModel>> => this.save_withUserId(syncer),
+            deleteByUserID: (): Promise<ReturnType<UserModel>> => this.delete_byUserId(syncer)
         };
     };
 
 
     private get_byUserId = async (syncer: Syncer): Promise<ReturnType<UserModel>> => {
         if (this.id == UserModel.NULL_Id)
-            return [{ code: 1, msg: "Id cannot be NULL" }, this];
+            return [ModelError.KEY_IS_NULL, this];
 
         try {
             const [results] = await syncer.execute(
@@ -73,11 +74,10 @@ export class UserModel implements Model, IUserData {
             this.role = Number(raw.role);
             this.officeID = raw.office_id;
 
-            return [{ code: 0, msg: "" }, this];
+            return [ModelError.NO_ERRORS, this];
 
         } catch (e) {
-            console.log("[SQL][ERROR]:", e.sqlMessage);
-            return [{ code: 2, msg: e.sqlMessage }, this];
+            return [ModelError.SQL_ERROR, this];
         }
     };
 
@@ -88,7 +88,7 @@ export class UserModel implements Model, IUserData {
             this.telephone == UserModel.NULL_telephone ||
             this.role == UserModel.NULL_role ||
             this.officeID == UserModel.NULL_officeID
-        ) return [{ code: 1, msg: "Essential Details cannot be NULL" }, this];
+        ) return [ModelError.ESSENTIALS_ARE_NULL, this];
 
         try {
             const [results] = await syncer.execute(
@@ -99,10 +99,9 @@ export class UserModel implements Model, IUserData {
             );
 
             this.id = results.insertId;
-            return [{ code: 0, msg: "" }, this];
+            return [ModelError.NO_ERRORS, this];
         } catch (e) {
-            console.log("[SQL][ERROR]:", e.sqlMessage);
-            return [{ code: 2, msg: e.sqlMessage }, this];
+            return [ModelError.SQL_ERROR, this];
         }
     }
 
@@ -115,7 +114,7 @@ export class UserModel implements Model, IUserData {
             this.telephone == UserModel.NULL_telephone ||
             this.role == UserModel.NULL_role ||
             this.officeID == UserModel.NULL_officeID
-        ) return [{ code: 1, msg: "Essential details cannot be NULL" }, this];
+        ) return [ModelError.ESSENTIALS_ARE_NULL, this];
 
         try {
             await syncer.execute(
@@ -127,17 +126,16 @@ export class UserModel implements Model, IUserData {
                     ${this.officeID})`
             );
 
-            return [{ code: 0, msg: "" }, this];
+            return [ModelError.NO_ERRORS, this];
 
         } catch (e) {
-            console.log("[SQL][ERROR]:", e.sqlMessage);
-            return [{ code: 2, msg: e.sqlMessage }, this];
+            return [ModelError.SQL_ERROR, this];
         }
     }
 
     private async delete_byUserId(syncer: Syncer): Promise<ReturnType<UserModel>> {
         if (this.id == UserModel.NULL_Id)
-            return [{ code: 1, msg: "userId cannot be NULL" }, this];
+            return [ModelError.KEY_IS_NULL, this];
 
         try {
             await syncer.execute(
@@ -146,10 +144,9 @@ export class UserModel implements Model, IUserData {
             );
             this.id = UserModel.NULL_Id;
 
-            return [{ code: 0, msg: "" }, this];
+            return [ModelError.NO_ERRORS, this];
         } catch (e) {
-            console.log("[SQL][ERROR]:", e.sqlMessage);
-            return [{ code: 2, msg: e.sqlMessage }, this];
+            return [ModelError.SQL_ERROR, this];
         }
 
     }

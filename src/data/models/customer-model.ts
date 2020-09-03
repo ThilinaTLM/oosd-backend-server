@@ -1,15 +1,16 @@
 import { Model, Syncer } from "../index";
 import { ReturnType } from "../../extra";
+import { ModelError } from "../../packages/errors/err-model";
 
 export interface ICustomerData {
-     id: number;
-     fullName: string;
-     nic: string;
-     email: string;
-     telephone: string;
-     address: string;
-     divisionalOfficeID: number;
-     gnOfficeID: string;
+    id: number;
+    fullName: string;
+    nic: string;
+    email: string;
+    telephone: string;
+    address: string;
+    divisionalOfficeID: number;
+    gnOfficeID: string;
 }
 
 class CustomerModel implements Model, ICustomerData {
@@ -60,7 +61,7 @@ class CustomerModel implements Model, ICustomerData {
 
     private get_byCustomerId = async (syncer: Syncer): Promise<ReturnType<CustomerModel>> => {
         if (this.id == CustomerModel.NULL_Id)
-            return [{ code: 1, msg: "Id cannot be NULL" }, this];
+            return [ModelError.KEY_IS_NULL, this];
 
         try {
             const [results] = await syncer.execute(
@@ -77,11 +78,10 @@ class CustomerModel implements Model, ICustomerData {
             this.divisionalOfficeID = raw.divisional_office_id;
             this.gnOfficeID = raw.gn_office_id;
 
-            return [{ code: 0, msg: "" }, this];
+            return [ModelError.NO_ERRORS, this];
 
         } catch (e) {
-            console.log("[SQL][ERROR]:", e.sqlMessage);
-            return [{ code: 2, msg: e.sqlMessage }, this];
+            return [ModelError.SQL_ERROR, this];
         }
     };
 
@@ -92,7 +92,7 @@ class CustomerModel implements Model, ICustomerData {
             this.address == CustomerModel.NULL_Address ||
             this.divisionalOfficeID == CustomerModel.NULL_DivisionalOfficeID ||
             this.gnOfficeID == CustomerModel.NULL_GnOffice
-        ) return [{ code: 1, msg: "Essential Details cannot be NULL" }, this];
+        ) return [ModelError.ESSENTIALS_ARE_NULL, this];
 
         try {
             const [results] = await syncer.execute(
@@ -105,10 +105,9 @@ class CustomerModel implements Model, ICustomerData {
             );
 
             this.id = results.insertId;
-            return [{ code: 0, msg: "" }, this];
+            return [ModelError.NO_ERRORS, this];
         } catch (e) {
-            console.log("[SQL][ERROR]:", e.sqlMessage);
-            return [{ code: 2, msg: e.sqlMessage }, this];
+            return [ModelError.SQL_ERROR, this];
         }
     }
 
@@ -121,7 +120,7 @@ class CustomerModel implements Model, ICustomerData {
             this.address == CustomerModel.NULL_Address ||
             this.divisionalOfficeID == CustomerModel.NULL_DivisionalOfficeID ||
             this.gnOfficeID == CustomerModel.NULL_GnOffice
-        ) return [{ code: 1, msg: "Essential details cannot be NULL" }, this];
+        ) return [ModelError.ESSENTIALS_ARE_NULL, this];
 
         try {
             await syncer.execute(
@@ -133,17 +132,16 @@ class CustomerModel implements Model, ICustomerData {
                     ${this.gnOfficeID})`
             );
 
-            return [{ code: 0, msg: "" }, this];
+            return [ModelError.NO_ERRORS, this];
 
         } catch (e) {
-            console.log("[SQL][ERROR]:", e.sqlMessage);
-            return [{ code: 2, msg: e.sqlMessage }, this];
+            return [ModelError.SQL_ERROR, this];
         }
     }
 
     private async delete_byCustomerId(syncer: Syncer): Promise<ReturnType<CustomerModel>> {
         if (this.id == CustomerModel.NULL_Id)
-            return [{ code: 1, msg: "CustomerId cannot be NULL" }, this];
+            return [ModelError.KEY_IS_NULL, this];
 
         try {
             await syncer.execute(
@@ -152,10 +150,9 @@ class CustomerModel implements Model, ICustomerData {
             );
             this.id = CustomerModel.NULL_Id;
 
-            return [{ code: 0, msg: "" }, this];
+            return [ModelError.NO_ERRORS, this];
         } catch (e) {
-            console.log("[SQL][ERROR]:", e.sqlMessage);
-            return [{ code: 2, msg: e.sqlMessage }, this];
+            return [ModelError.SQL_ERROR, this];
         }
 
     }

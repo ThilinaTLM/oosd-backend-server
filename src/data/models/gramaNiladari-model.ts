@@ -1,5 +1,6 @@
 import { Model, Syncer } from "../index";
 import { ReturnType } from "../../extra";
+import { ModelError } from "../../packages/errors/err-model";
 
 
 export interface IGramaNiladariModel{
@@ -36,7 +37,7 @@ export class GramaNiladariModel implements Model {
  
     private get_byGnId = async (syncer: Syncer): Promise<ReturnType<GramaNiladariModel>> => {
         if (this.id == GramaNiladariModel.NULL_Id)
-            return [{ code: 1, msg: "Id cannot be NULL" }, this];
+            return [ModelError.KEY_IS_NULL, this];
 
         try {
             const [results] = await syncer.execute(
@@ -47,17 +48,16 @@ export class GramaNiladariModel implements Model {
             this.id = raw.id;
             this.gnDivisionName = raw.gn_division_name;
             
-            return [{ code: 0, msg: "" }, this];
+            return [ModelError.NO_ERRORS, this];
 
         } catch (e) {
-            console.log("[SQL][ERROR]:", e.sqlMessage);
-            return [{ code: 2, msg: e.sqlMessage }, this];
+            return [ModelError.SQL_ERROR, this];
         }
     };
 
     private async save_withoutGnId(syncer: Syncer): Promise<ReturnType<GramaNiladariModel>> {
         if ( this.gnDivisionName == GramaNiladariModel.NULL_gnDivisionName )
-            return [{ code: 1, msg: "Essential Details cannot be NULL" }, this];
+            return [ModelError.ESSENTIALS_ARE_NULL, this];
 
         try {
             const [results] = await syncer.execute(
@@ -68,16 +68,15 @@ export class GramaNiladariModel implements Model {
             );
 
             this.id = results.insertId;
-            return [{ code: 0, msg: "" }, this];
+            return [ModelError.NO_ERRORS, this];
         } catch (e) {
-            console.log("[SQL][ERROR]:", e.sqlMessage);
-            return [{ code: 2, msg: e.sqlMessage }, this];
+            return [ModelError.SQL_ERROR, this];
         }
     }
 
     private async save_withGnId(syncer: Syncer): Promise<ReturnType<GramaNiladariModel>> {
         if (this.id == GramaNiladariModel.NULL_Id || this.gnDivisionName == GramaNiladariModel.NULL_gnDivisionName )
-            return [{ code: 1, msg: "Essential details cannot be NULL" }, this];
+            return [ModelError.ESSENTIALS_ARE_NULL, this];
 
         try {
             await syncer.execute(
@@ -87,17 +86,16 @@ export class GramaNiladariModel implements Model {
                     (${this.id}, ${this.gnDivisionName}')`
             );
 
-            return [{ code: 0, msg: "" }, this];
+            return [ModelError.NO_ERRORS, this];
 
         } catch (e) {
-            console.log("[SQL][ERROR]:", e.sqlMessage);
-            return [{ code: 2, msg: e.sqlMessage }, this];
+            return [ModelError.SQL_ERROR, this];
         }
     }
 
     private async delete_byGnId(syncer: Syncer): Promise<ReturnType<GramaNiladariModel>> {
         if (this.id == GramaNiladariModel.NULL_Id)
-            return [{ code: 1, msg: "userId cannot be NULL" }, this];
+            return [ModelError.KEY_IS_NULL, this];
 
         try {
             await syncer.execute(
@@ -106,10 +104,9 @@ export class GramaNiladariModel implements Model {
             );
             this.id = GramaNiladariModel.NULL_Id;
 
-            return [{ code: 0, msg: "" }, this];
+            return [ModelError.NO_ERRORS, this];
         } catch (e) {
-            console.log("[SQL][ERROR]:", e.sqlMessage);
-            return [{ code: 2, msg: e.sqlMessage }, this];
+            return [ModelError.SQL_ERROR, this];
         }
 
     }
