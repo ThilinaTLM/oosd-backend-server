@@ -1,7 +1,19 @@
-require('dotenv').config()
-import { Server } from "./server/server";
+import bodyParser from "body-parser";
 
-const PORT = Number(process.env.PORT) || 8080
+require("dotenv").config();
+import express from "express";
+import { apiRouter } from "./routes";
 
-const server = Server.instance;
-server.start(PORT);
+const PORT = Number(process.env.PORT) || 8080;
+
+const app = express();
+
+// middle-wares
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+
+// routes
+app.use("/api", apiRouter);
+
+// start
+app.listen(PORT, () => console.log(`Listening at ${PORT}`));
