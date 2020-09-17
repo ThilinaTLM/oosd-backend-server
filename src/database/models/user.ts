@@ -28,7 +28,7 @@ const mapper = BuildMapper<UserData>([
 
 
 export const user = {
-    getUserByUsername: async (username: string): Promise<[ModelError, UserData]> => {
+    getUserAccount: async (username: string): Promise<[ModelError, UserData]> => {
         if (!username) {
             return [MErr.WRONG_ARGUMENTS, {} as UserData];
         }
@@ -73,29 +73,51 @@ export const user = {
         return [error, args[0] as string];
     },
 
-    updateUserDetails: async (data: any): Promise<ModelError> => {
-        let user_id = data.userId;
+    getUser: async (condition: any): Promise<[ModelError, UserData[]]> => {
+        condition = mapper.backward(condition)
+
+        const [error, results] = await mysqlExeEW.run(...QBuild.SELECT('users', condition))
+
+        let users;
+        if (error === "") { // if error
+            users = results[0]; // [results, fields]
+            for (let i = 0; i < users.length; i++) {
+                users[i] = mapper.forward(users[i]);
+            }
+        }
+
+        return [error, users];
+
+    },
+
+    updateUserDetails: async (userId: string, data: any): Promise<ModelError> => {
+        // remove unique fields
+        delete data.userId
+
         data = mapper.backward(data);
-        delete data.user_id;
-        const [error, _] = await mysqlExeEW.run(...QBuild.UPDATE("users", data, { user_id }));
+
+        const [error, _] = await mysqlExeEW.run(...QBuild.UPDATE("users", data, { user_id: userId }));
         return error;
     },
 
-    updateCredentials: async (data: any): Promise<ModelError> => {
-        let user_id = data.userId;
-        data = mapper.backward(data);
+    updateCredentials: async (userId: string, data: any): Promise<ModelError> => {
         delete data.user_id;
-        const [error, _] = await mysqlExeEW.run(...QBuild.UPDATE("credentials", data, { user_id }));
+
+        data = mapper.backward(data);
+
+        const [error, _] = await mysqlExeEW.run(...QBuild.UPDATE("credentials", data, { user_id: userId }));
         return error;
     },
 
     checkUsername: async (username: string): Promise<[ModelError, boolean]> => {
-        const [error, data] = await mysqlExeEW.run("SELECT * FROM credentials WHERE username = ?", [username]);
-        if (error !== "") {
+
+        const [error, data] = await mysqlExeEW.run(...QBuild.SELECT('credentials', {username}))
+
+        if (error !== "") { // if any error happens
             return [error, true];
         }
 
-        return [error, data[0].length === 0];
+        return [error, data[0].length !== 0];
     }
 };
 

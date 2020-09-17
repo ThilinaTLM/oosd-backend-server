@@ -40,11 +40,11 @@ CREATE TABLE IF NOT EXISTS customers (
     customer_id VARCHAR(36) NOT NULL,
     full_name TEXT NOT NULL,
     nic VARCHAR(20) NOT NULL,
-    email VARCHAR(100) NULL,
-    telephone VARCHAR(12) NULL,
-    address TEXT NULL,
+    email VARCHAR(100),
+    telephone VARCHAR(12),
+    address TEXT,
 
-    divisional_office VARCHAR(100),
+    divisional_office VARCHAR(100) NOT NULL,
     gn_office VARCHAR(100),
 
     PRIMARY KEY (customer_id),
@@ -148,7 +148,7 @@ CREATE TABLE complaint_states (
 DROP TABLE IF EXISTS complaints ;
 
 CREATE TABLE IF NOT EXISTS complaints (
-    id VARCHAR(36) NOT NULL,
+    complaint_id VARCHAR(36) NOT NULL,
     ref_no VARCHAR(50),
     type VARCHAR(50) NOT NULL,
 
@@ -162,7 +162,7 @@ CREATE TABLE IF NOT EXISTS complaints (
     assigned_by VARCHAR(36),
     assigned_date TIMESTAMP NULL,
 
-    PRIMARY KEY (id),
+    PRIMARY KEY (complaint_id),
 
     CONSTRAINT fk_assigned_div
         FOREIGN KEY (assigned_div)
@@ -226,6 +226,12 @@ CREATE TABLE complaint_log (
     note TEXT,
     
     PRIMARY KEY(id),
+
+    CONSTRAINT fk_log_complint_id
+        FOREIGN KEY (complaint_id)
+        REFERENCES complaint (complaint_id)
+        ON DELETE NO ACTION
+        ON UPDATE NO ACTION,
     
     CONSTRAINT fk_pre_state
     	FOREIGN KEY (previous_state)

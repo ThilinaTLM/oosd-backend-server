@@ -3,6 +3,8 @@ import { userRouter } from "./api/user";
 import { RBuilder } from "../middlewares";
 import { Response } from "../core";
 import { utilsRouter } from "./api/utils";
+import { fileRouter } from "./file";
+import { cusRouter } from "./api/customer";
 
 export const apiRouter = Router();
 
@@ -26,4 +28,6 @@ apiRouter.get("/", (req, res) => {
  * Routers
  */
 apiRouter.use("/user", userRouter);
+apiRouter.use("/customer", cusRouter)
 apiRouter.use("/util", utilsRouter);
+apiRouter.use("/file", fileRouter);

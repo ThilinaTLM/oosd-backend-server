@@ -1,14 +1,46 @@
 import { Handler } from "express";
-import { userLogin } from "./user/login";
-import { addUser } from "./user/add";
-import { addDivision, addGNOffice, getAllDivisions, getAllGNOffices } from "./utils";
+import {
+    addUser,
+    loginUser,
+    getUser,
+    isUsernameExist,
+    updateUserData,
+    updateCredential,
+    verifyUser,
+    disableUser
+} from "./user";
+import {
+    addCustomer,
+    getCustomer,
+    updateCustomer} from "./customer";
+import {
+    addDivision,
+    addGNOffice,
+    getAllDivisions,
+    getAllGNOffices } from "./utils";
+import { fileServer } from "./file";
 
 /**
  * User Account Controllers
  */
 export const user = {
-    login: userLogin as Handler, // login user with username and password
-    add: addUser as Handler // add user account
+    login: loginUser as Handler, // login user with username and password
+    add: addUser as Handler, // add user account
+    get: getUser as Handler,
+    checkUsername: isUsernameExist as Handler,
+    updateData: updateUserData as Handler,
+    updateCredential: updateCredential as Handler,
+    verify: verifyUser as Handler,
+    disable: disableUser as Handler
+};
+
+/**
+ * Customer Profile Controllers
+ */
+export const customer = {
+    add: addCustomer as Handler,
+    get: getCustomer as Handler,
+    update: updateCustomer as Handler
 };
 
 /**
@@ -20,3 +52,8 @@ export const utils = {
     getAllDivisions: getAllDivisions as Handler,
     getAllGNOffices: getAllGNOffices as Handler
 };
+
+/**
+ * Serve Static Files
+ */
+export const files = fileServer;

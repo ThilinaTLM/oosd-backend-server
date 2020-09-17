@@ -1,4 +1,3 @@
-
 interface ResData {
     data?: any,
     token?: string,
@@ -7,6 +6,7 @@ interface ResData {
 
 interface IResponse {
     status(code: number): IResponse
+
     json(obj: any): IResponse
 }
 
@@ -24,19 +24,45 @@ class StatusCode {
         return this._code;
     }
 
-    OK = () => this.setCode(200);
-    CREATED = () => this.setCode(201);
-    NO_CONTENT = () => this.setCode(204);
+    OK(): ResponseBuilder {
+        return this.setCode(200);
+    }
 
-    MV_PERM = () => this.setCode(301);
-    NOT_MOD = () => this.setCode(304);
+    CREATED(): ResponseBuilder {
+        return this.setCode(201);
+    }
 
-    BAD_REQ = () => this.setCode(400);
-    UN_AUTH = () => this.setCode(401);
-    FORBIDDEN = () => this.setCode(403);
-    NOT_FOUND = () => this.setCode(404);
+    NO_CONTENT(): ResponseBuilder {
+        return this.setCode(204);
+    }
 
-    ERROR = () => this.setCode(500);
+    MV_PERM(): ResponseBuilder {
+        return this.setCode(301);
+    }
+
+    NOT_MOD(): ResponseBuilder {
+        return this.setCode(304);
+    }
+
+    BAD_REQ(): ResponseBuilder {
+        return this.setCode(400);
+    }
+
+    UN_AUTH(): ResponseBuilder {
+        return this.setCode(401);
+    }
+
+    FORBIDDEN(): ResponseBuilder {
+        return this.setCode(403);
+    }
+
+    NOT_FOUND(): ResponseBuilder {
+        return this.setCode(404);
+    }
+
+    ERROR(): ResponseBuilder {
+        return this.setCode(500);
+    }
 
     private setCode(code: number): ResponseBuilder {
         this._code = code;
@@ -59,6 +85,12 @@ export class ResponseBuilder {
         this._res.status(this.status.code);
         this._res.json(this._data);
     };
+
+    send_ISE(): void {
+        this.status.ERROR()
+        this.message('Internal Server Error');
+        this.send()
+    }
 
     token(token: string): ResponseBuilder {
         this._data.token = token;

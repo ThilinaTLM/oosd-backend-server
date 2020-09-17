@@ -36,10 +36,9 @@ export class ErrorHandlerWrapper {
     }
 
     async run(query: string, args: Array<any> = []): Promise<ReturnType>{
-        let results;
         try {
             ErrorHandlerWrapper.resolveUndefined(args); // change undefined values as null
-            results =  await this.executor.execute(query, args);
+            const results =  await this.executor.execute(query, args);
             return [ModelErrorSet.NO_ERRORS, results];
         } catch (e) {
             for (let i = 0; i < this.eHandlers.length; i++) {

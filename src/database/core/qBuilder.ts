@@ -57,6 +57,31 @@ export const QBuild = {
             values
         ];
 
+    },
+
+    /**
+     * Select * Query Builder
+     * @param table : table name
+     * @param condition : object, condition which need to put in where
+     */
+    SELECT(table: string, condition: DataObject): [string, Array<DataObjectValue>] {
+        const where = [], values = []
+        for (let k in condition) {
+            where.push(`${k} = ?`);
+            values.push(condition[k]);
+        }
+
+        if (where.length === 0) {
+            return  [
+                `SELECT * FROM ${table}`,
+                values
+            ]
+        }
+
+        return  [
+            `SELECT * FROM ${table} WHERE ${where.join(" AND ")}`,
+            values
+        ]
     }
 
 };

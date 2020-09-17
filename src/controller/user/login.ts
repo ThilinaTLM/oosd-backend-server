@@ -7,7 +7,7 @@ export const userLogin: Handler = async (req, res) => {
 
     const { username, password } = req.body;
 
-    const [error, data] = await model.user.getUserByUsername(username);
+    const [error, data] = await model.user.getUserAccount(username);
 
     // If no user exists
     if (error === MErr.NO_ENTRY_FOUND || error === MErr.WRONG_ARGUMENTS) {

@@ -1,5 +1,6 @@
 import { user } from "./models/user";
 import { utils } from "./models/utils";
+import {customer} from "./models/customer";
 import { ModelErrorSet, ModelError as MError } from "./core/errors";
 
 /**
@@ -13,5 +14,6 @@ export type ModelError = MError;
  */
 export const model = {
     user,
-    utils
+    utils,
+    customer
 };
