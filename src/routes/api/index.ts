@@ -1,10 +1,10 @@
 import { Router } from "express";
-import { userRouter } from "./api/user";
-import { RBuilder } from "../middlewares";
-import { Response } from "../core";
-import { utilsRouter } from "./api/utils";
-import { fileRouter } from "./file";
-import { cusRouter } from "./api/customer";
+import { Response } from "../../core";
+import { RBuilder } from "../../middlewares";
+import { userRouter } from "./user";
+import { cusRouter } from "./customer";
+import { comRouter } from "./complaint";
+import { utilsRouter } from "./utils";
 
 export const apiRouter = Router();
 
@@ -28,6 +28,6 @@ apiRouter.get("/", (req, res) => {
  * Routers
  */
 apiRouter.use("/user", userRouter);
-apiRouter.use("/customer", cusRouter)
+apiRouter.use("/customer", cusRouter);
+apiRouter.use("/complaint", comRouter)
 apiRouter.use("/util", utilsRouter);
-apiRouter.use("/file", fileRouter);

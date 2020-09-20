@@ -12,13 +12,21 @@ import {
 import {
     addCustomer,
     getCustomer,
-    updateCustomer} from "./customer";
+    updateCustomer
+} from "./customer";
 import {
     addDivision,
     addGNOffice,
     getAllDivisions,
-    getAllGNOffices } from "./utils";
-import { fileServer } from "./file";
+    getAllGNOffices
+} from "./utils";
+import {
+    addComplaint,
+    getComplaint,
+    updateComplaint
+} from "./complaint";
+
+import { getAttachment } from "./file";
 
 /**
  * User Account Controllers
@@ -44,9 +52,18 @@ export const customer = {
 };
 
 /**
+ * Complaint Controllers
+ */
+export const complaint = {
+    addComplaint: addComplaint as Handler,
+    getComplaint: getComplaint as Handler,
+    updateComplaint: updateComplaint as Handler
+};
+
+/**
  * Additional Controllers
  */
-export const utils = {
+export const util = {
     addDivision: addDivision as Handler,
     addGNOffice: addGNOffice as Handler,
     getAllDivisions: getAllDivisions as Handler,
@@ -56,4 +73,6 @@ export const utils = {
 /**
  * Serve Static Files
  */
-export const files = fileServer;
+export const file = {
+    getAttachment: getAttachment as Handler
+};

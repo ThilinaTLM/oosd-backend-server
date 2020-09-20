@@ -1,9 +1,19 @@
 import { Router } from "express";
-import { files } from "../../controller";
+import { file } from "../../controller";
+import { attachmentParser } from "../../middlewares";
 
 export const fileRouter = Router()
 
 /**
  * Serving Files
  */
-fileRouter.use('/get', files )
+fileRouter.get('/attachment/:attachmentId', file.getAttachment)
+
+/**
+ * Single file upload
+ */
+fileRouter.post('/upload', attachmentParser, (req, res) => {
+    res.status(200).json({
+        message: 'Successfully Uploaded'
+    })
+})

@@ -67,7 +67,7 @@ CREATE UNIQUE INDEX nic_UNIQUE ON customers (nic ASC);
 CREATE INDEX fk_divisional_office_x ON customers (divisional_office ASC);
 CREATE INDEX fk_gn_office_x ON customers (gn_office ASC);
 
--- users roles ---------------------------------------------------------------------------------------------------------------
+-- users roles ---------------------------------------------------------------------------------------------------------
 DROP TABLE IF EXISTS user_roles ;
 
 CREATE TABLE IF NOT EXISTS user_roles (
@@ -109,7 +109,7 @@ ENGINE = InnoDB;
 
 CREATE INDEX fk_office_x ON users (office ASC);
 
--- credentials --------------------------------------------------------------------------------------------------------
+-- credentials ---------------------------------------------------------------------------------------------------------
 CREATE TABLE credentials (
     user_id VARCHAR(36),
     username VARCHAR(50) NOT NULL,
@@ -128,7 +128,7 @@ ENGINE = InnoDB;
 
 CREATE UNIQUE INDEX idx_username ON credentials (username ASC);
 
--- complaint types ----------------------------------------------------------------------------------------------------
+-- complaint types -----------------------------------------------------------------------------------------------------
 CREATE TABLE complaint_types (
 	type VARCHAR(50),
 	description VARCHAR(255),
@@ -276,7 +276,7 @@ CREATE INDEX fk_notification_user_idx ON notifications (user_id ASC);
 -- | |   | | | (_) | (_|  __/ (_| | |_| | | |  __/\__ \
 -- |_|   |_|  \___/ \___\___|\__,_|\__,_|_|  \___||___/
 --
-
+-- ---------------------------------------------------------------------------------------------------------------------
 DELIMITER //
 
 CREATE PROCEDURE AddAccount (
