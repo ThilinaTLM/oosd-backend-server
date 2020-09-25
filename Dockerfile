@@ -3,6 +3,7 @@ WORKDIR /usr/src/app
 
 COPY package*.json ./
 RUN npm install
+RUN npm install -g typescript
 
 ENV MYSQL_HOST=sql12.freemysqlhosting.net
 ENV MYSQL_USER=sql12367113
