@@ -1,6 +1,6 @@
 
 -- User Roles
-INSERT INTO user_roles VALUES ('Admin', '');
+INSERT INTO user_roles VALUES ('Administrator', '');
 INSERT INTO user_roles VALUES ('District Officer', '');
 INSERT INTO user_roles VALUES ('District Secretariat', '');
 INSERT INTO user_roles VALUES ('Divisional Officer', '');
@@ -26,5 +26,5 @@ INSERT INTO complaint_types VALUES ('By Prime Minister Office', '');
 INSERT INTO complaint_types VALUES ('Third-party Department', '');
 
 -- Users
-INSERT INTO users VALUES ('f1d41c52-2219-4bee-8aa0-035c2a16e786', 'Admin', 'Admin', 'User', '', '', NULL);
+INSERT INTO users VALUES ('f1d41c52-2219-4bee-8aa0-035c2a16e786', 'Administrator', 'Admin', 'User', '', '', NULL);
 INSERT INTO credentials VALUES ('f1d41c52-2219-4bee-8aa0-035c2a16e786', 'admin', '$2b$10$K.4B6mFBrtUltu8gjQOICOPORLSQ0FfILsrN1iKty5PAbYaQ7CJ8u', 1 );

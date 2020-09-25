@@ -1,4 +1,4 @@
-import { Handler } from "../../core";
+import { ComStates, Handler } from "../../core";
 import { MErr, model } from "../../database";
 
 export const addComplaint: Handler = async (req, res) => {
@@ -57,3 +57,19 @@ export const updateComplaint: Handler = async (req, res) => {
 
     r.send_ISE();
 };
+
+export const sendTo_DistrictSecApproval: Handler = async (req, res) => {
+    const {r} = res;
+    const {complaintId} = req.params
+
+    const error = await model.complaint.updateComplaint(complaintId, {status: ComStates.AWAIT_APR})
+
+    if (error == MErr.NO_ERRORS) {
+        r.status.OK()
+            .message("Success")
+            .send();
+        return;
+    }
+
+    r.send_ISE();
+}

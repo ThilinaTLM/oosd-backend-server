@@ -1,0 +1,21 @@
+FROM node:14
+WORKDIR /usr/src/app
+
+COPY package*.json ./
+RUN npm install
+
+ENV MYSQL_HOST=localhost
+ENV MYSQL_USER=root
+ENV MYSQL_USER_PASSWORD=TLM98@mysql
+ENV MYSQL_DATABASE=cms
+ENV MYSQL_CONNECTION_LIMIT=20
+ENV SALT_ROUNDS=10
+ENV SECRET_KEY=nqygkOnkrQtHJg47Bhdzg7YtvM
+ENV UPLOADS_DIR=uploads
+ENV PORT=8000
+ENV ALLOWED_HOST=http://localhost:8080
+
+RUN npm run build
+COPY . .
+EXPOSE 8000
+CMD [ "node", "dist/main.js" ]
