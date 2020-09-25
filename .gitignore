@@ -1,6 +1,5 @@
 # dependencies and build files
 node_modules
-dist
 test
 
 # environment files

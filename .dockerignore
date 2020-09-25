@@ -1,7 +1,7 @@
 # dependencies and build files
 node_modules
-dist
 test
+src
 
 # environment files
 .env
