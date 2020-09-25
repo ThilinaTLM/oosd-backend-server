@@ -1,7 +1,7 @@
 FROM node:14
 WORKDIR /usr/src/app
 
-COPY package*.json ./
+COPY . .
 RUN npm install
 RUN npm install -g typescript
 
@@ -17,6 +17,5 @@ ENV PORT=8000
 ENV ALLOWED_HOST=*
 
 RUN npm run build
-COPY . .
 EXPOSE 8000
 CMD [ "node", "dist/main.js" ]
