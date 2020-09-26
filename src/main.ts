@@ -6,13 +6,16 @@ import { apiRouter } from "./routes/api";
 import { fileRouter } from "./routes/file";
 
 const PORT = Number(process.env.PORT) || 8080;
-const allowOrigin = process.env.ALLOWED_HOST;
+const allowOrigins = process.env.ALLOWED_HOST || '';
+
 const app = express();
 
-// middle-wares
-app.use(cors({
-    origin: [allowOrigin as string, 'http://localhost:8000']
-}));
+// Middle-wares
+if (allowOrigins == "all") {
+    app.use(cors());
+} else {
+    app.use(cors({origin: allowOrigins.split('+')}));
+}
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
