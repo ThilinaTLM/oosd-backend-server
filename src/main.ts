@@ -1,21 +1,27 @@
-import express, { Request, Response } from "express";
+require("dotenv").config();
+import bodyParser from "body-parser";
+import express from "express";
+import cors from "cors";
+import { apiRouter } from "./routes/api";
+import { fileRouter } from "./routes/file";
 
-import rApi from "./api";
-import { PORT } from "./env";
-import models from "./model";
-
-// Request Handlers ---------------------------------------------------------------------
-
-function index(req: Request, res: Response) {
-    res.send("Welcome");
-}
-
-//---------------------------------------------------------------------------------------
+const PORT = Number(process.env.PORT) || 8080;
+const allowOrigins = process.env.ALLOWED_HOST || '';
 
 const app = express();
 
-app.locals.models = models;
-app.use("/api/", rApi);
-app.get("/", index);
+// Middle-wares
+if (allowOrigins == "all") {
+    app.use(cors());
+} else {
+    app.use(cors({origin: allowOrigins.split('+')}));
+}
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
-app.listen(PORT, () => console.log(`Listening at port ${PORT}`));
+// routes
+app.use("/api", apiRouter);
+app.use("/file", fileRouter);
+
+// start
+app.listen(PORT, () => console.log(`Listening at ${PORT}`));

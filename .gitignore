@@ -1,7 +1,14 @@
-# Folders
+# dependencies and build files
 node_modules
 dist
+test
 
-# Files
-yarn.lock
+# environment files
 .env
+.vscode
+.idea
+uploads
+
+# pkg manager files
+yarn.lock
+package-lock.json
