@@ -1,10 +1,6 @@
 FROM node:14
 WORKDIR /usr/src/app
 
-COPY . .
-RUN npm install
-RUN npm install -g typescript
-
 ENV MYSQL_HOST=sql12.freemysqlhosting.net
 ENV MYSQL_USER=sql12367113
 ENV MYSQL_USER_PASSWORD=zyPRp3WVkH
@@ -15,6 +11,10 @@ ENV SECRET_KEY=nqygkOnkrQtHJg47Bhdzg7YtvM
 ENV UPLOADS_DIR=uploads
 ENV PORT=8000
 ENV ALLOWED_HOST=all
+
+COPY . .
+RUN npm install
+RUN npm install -g typescript
 
 RUN npm run build
 EXPOSE 8000

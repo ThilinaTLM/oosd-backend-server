@@ -1,19 +1,20 @@
 import { Router } from "express";
 import { file } from "../../controller";
-import { attachmentParser } from "../../middlewares";
+import { attachmentParser, preBuilt, RBuilder } from "../../middlewares";
 
 export const fileRouter = Router()
 
 /**
+ * Middle-wares
+ */
+fileRouter.use(RBuilder);
+
+/**
  * Serving Files
  */
-fileRouter.get('/attachment/:attachmentId', file.getAttachment)
+fileRouter.get('/attachment/:attachmentId',  preBuilt.ALL_ROLES, file.getAttachment);
 
 /**
  * Single file upload
  */
-fileRouter.post('/upload', attachmentParser, (req, res) => {
-    res.status(200).json({
-        message: 'Successfully Uploaded'
-    })
-})
+fileRouter.post('/upload/attachment', preBuilt.ALL_ROLES, attachmentParser, file.addAttachment);

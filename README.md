@@ -30,3 +30,10 @@ at Galle District Secretariat Office
 - POST add-gn-office
 - GET all-divs
 - GET all-gn-offices
+
+#### FILE
+
+
+> mysql -h sql12.freemysqlhosting.net -u sql12367113 -pzyPRp3WVkH -D sql12367113
+> source ./src/database/migration/schema.sql
+> source ./src/database/migration/insert.sql

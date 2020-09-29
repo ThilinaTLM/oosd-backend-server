@@ -114,3 +114,6 @@ export class AuthBuilder {
         return authMW.middleware as Handler;
     }
 }
+
+
+new AuthBuilder().allow.ADMIN().build()

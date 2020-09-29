@@ -12,9 +12,10 @@ export const attachmentStorage = multer.diskStorage({
     destination: function(req, file, cb) {
         cb(null, ATTACHMENTS_DIRECTORY);
     },
+
     // By default, multer removes file extensions so let's add them back
     filename: function(req, file, cb) {
-        cb(null, genUUID() + extname(file.originalname));
+        cb(null, genUUID());
     }
 });
 

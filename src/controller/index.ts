@@ -22,11 +22,14 @@ import {
 } from "./utils";
 import {
     addComplaint,
+    addAttachment,
     getComplaint,
-    updateComplaint
+    getAttachments,
+    getComplaintLog,
+    updateComplaintStatus
 } from "./complaint";
 
-import { getAttachment } from "./file";
+import { getAttachment, uploadAttachment } from "./file";
 
 /**
  * User Account Controllers
@@ -57,7 +60,10 @@ export const customer = {
 export const complaint = {
     addComplaint: addComplaint as Handler,
     getComplaint: getComplaint as Handler,
-    updateComplaint: updateComplaint as Handler
+    addAttachment: addAttachment as Handler,
+    getAttachments: getAttachments as Handler,
+    getComplaintLog: getComplaintLog as Handler,
+    updateComplaintStatus: updateComplaintStatus as Handler
 };
 
 /**
@@ -74,5 +80,6 @@ export const util = {
  * Serve Static Files
  */
 export const file = {
-    getAttachment: getAttachment as Handler
+    getAttachment: getAttachment as Handler,
+    addAttachment: uploadAttachment as Handler
 };

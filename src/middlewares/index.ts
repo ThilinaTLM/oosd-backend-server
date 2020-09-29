@@ -4,7 +4,7 @@ import { Handler } from "express";
 import { attachmentUpload } from "./uploader/uploader";
 
 /**
- * Authentication Middleware builder with PreBuilts
+ * Authentication Middleware builder with PreBuilds
  * ABuilder: Function which returns Builder Object
  */
 export const ABuilder = () => new AuthBuilder();
@@ -14,7 +14,6 @@ export const preBuilt = {
     ONLY_DIS_OFFICER: ABuilder().allow.DIS_OCR().build(),
     ONLY_DIS_SEC: ABuilder().allow.DIS_SEC().build()
 };
-
 
 /**
  * Bind RBuilder instance with every Response
