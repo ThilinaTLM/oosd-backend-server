@@ -1,5 +1,5 @@
 export const USER_ROLES = {
-    ADMIN: "Admin",
+    ADMIN: "Administrator",
     DIS_OCR: "District Officer",
     DIS_SEC: "District Secretariat",
     DIV_OCR: "Divisional Officer",
