@@ -102,6 +102,7 @@ export class AuthBuilder {
 
     disableToken() {
         this.responseTokenError = false
+        return this;
     }
 
 

@@ -1,11 +1,17 @@
 import { Handler } from "../../core";
 import { build } from "../core/users";
 import { MErr, model } from "../../database";
+import { URoles } from "../../core/";
 
 
 export const addUser: Handler = async (req, res) => {
     const { r } = res;
-    const new_user = build.DataUser(req.body, true);
+    let verified = false
+    if (req.user !== null && req.user.role === URoles.ADMIN) {
+        verified = true
+    }
+
+    const new_user = build.DataUser(req.body, verified);
 
     const [error, userId] = await model.user.addUser(new_user);
 

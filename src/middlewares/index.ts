@@ -12,7 +12,8 @@ export const preBuilt = {
     ALL_ROLES: ABuilder().build(),
     ONLY_ADMIN: ABuilder().allow.ADMIN().build(),
     ONLY_DIS_OFFICER: ABuilder().allow.DIS_OCR().build(),
-    ONLY_DIS_SEC: ABuilder().allow.DIS_SEC().build()
+    ONLY_DIS_SEC: ABuilder().allow.DIS_SEC().build(),
+    ALL_ROLES_NOT_STRICT: ABuilder().disableToken().build()
 };
 
 /**

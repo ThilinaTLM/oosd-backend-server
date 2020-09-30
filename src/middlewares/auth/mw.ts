@@ -65,6 +65,13 @@ export class AuthMW {
             return;
         }
 
+        if (this.strictToken && !payload.verified) {
+            r.status.UN_AUTH()
+                .message("Your account is unverified")
+                .send();
+            return;
+        }
+
         const ruleCheckerOrigins: Origins = {
             body: req.body,
             params: req.params,
