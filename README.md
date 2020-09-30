@@ -40,6 +40,6 @@ at Galle District Secretariat Office
 
 
 Database Details
-> mysql -h sql12.freemysqlhosting.net -u sql12367113 -pzyPRp3WVkH -D sql12367113
+> mysql -h sql12.freemysqlhosting.net -u sql12368059 -pjIlTR1bB9p -D sql12368059
 > source ./src/database/migration/schema.sql
 > source ./src/database/migration/insert.sql
