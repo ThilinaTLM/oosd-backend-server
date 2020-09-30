@@ -76,7 +76,7 @@ export const user = {
     getUser: async (condition: any): Promise<[ModelError, UserData[]]> => {
         condition = mapper.backward(condition)
 
-        const [error, results] = await mysqlExeEW.run(...QBuild.SELECT('users', condition))
+        const [error, results] = await mysqlExeEW.run(...QBuild.SELECT_USER(condition))
 
         let users;
         if (error === "") { // if error

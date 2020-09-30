@@ -82,6 +82,33 @@ export const QBuild = {
             `SELECT * FROM ${table} WHERE ${where.join(" AND ")}`,
             values
         ]
+    },
+
+    /**
+     * Select * Query Builder for Full UserAccount
+     * @param condition : object, condition which need to put in where
+     */
+    SELECT_USER(condition: DataObject): [string, Array<DataObjectValue>] {
+        const where = [], values = []
+        for (let k in condition) {
+            where.push(`${k} = ?`);
+            values.push(condition[k]);
+        }
+
+        if (where.length === 0) {
+            return  [
+                `SELECT u.*, c.verified, c.username FROM users u 
+                    JOIN credentials c ON c.user_id = u.user_id`,
+                values
+            ]
+        }
+
+        return  [
+            `SELECT u.*, c.verified, c.username FROM users u 
+                    JOIN credentials c ON c.user_id = u.user_id
+                        WHERE ${where.join(" AND ")}`,
+            values
+        ]
     }
 
 };
