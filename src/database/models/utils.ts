@@ -2,6 +2,7 @@ import { mysqlExeEW } from "../core/eWrapper/mysql";
 import { QBuild } from "../core/qBuilder";
 import { MErr, ModelError } from "../index";
 import { BuildMapper, mp } from "../core/mapper";
+import { Mode } from "fs";
 
 interface Office {
     name :string,
@@ -54,6 +55,22 @@ export const utils = {
         return error
     },
 
+    deleteDivision: async (name: string): Promise<ModelError> => {
+        const [error, _] = await mysqlExeEW.run(
+            ...QBuild.DELETE('divisional_offices', {name})
+        )
+
+        return error
+    },
+
+    deleteGNOffice: async (name: string): Promise<ModelError> => {
+        const [error, _] = await mysqlExeEW.run(
+            ...QBuild.DELETE('grama_niladhari_offices', {name})
+        )
+
+        return error
+    },
+
     addAttachment: async (attachmentId: string, originalName: string, contentType: string): Promise<ModelError> => {
         const [error, _] = await mysqlExeEW.run(
             ...QBuild.INSERT('attachments', {
@@ -81,4 +98,13 @@ export const utils = {
 
         return [error, attachment]
     },
+
+    getCount: async (table: string, condition: any = {}): Promise<[ModelError, number]> => {
+        const [error, count] = await mysqlExeEW.run(
+            ...QBuild.COUNT(table, condition)
+        )
+
+        return [error, count]
+    }
+
 };

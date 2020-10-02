@@ -117,3 +117,20 @@ export const updateComplaintStatus: Handler = async (req, res) => {
 
     r.send_ISE();
 };
+
+export const getComplaintCount: Handler = async (req, res) => {
+    const {r} = res;
+    const query = req.query
+
+    const [error, count] = await model.utils.getCount('complaints', query)
+
+    if (error == MErr.NO_ERRORS) {
+        r.status.OK()
+            .message("Success")
+            .data(count)
+            .send();
+        return;
+    }
+
+    r.send_ISE();
+}

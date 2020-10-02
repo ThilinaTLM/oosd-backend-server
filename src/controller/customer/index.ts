@@ -65,3 +65,21 @@ export const getCustomer: Handler = async (req, res) => {
         .message('Internal Server Error')
         .send()
 }
+
+export const getCustomerCount: Handler = async (req, res) => {
+    const {r} = res;
+
+    const [error, count] = await model.utils.getCount('customers');
+
+    if (error === MErr.NO_ERRORS) {
+        r.status.OK()
+            .message('Success')
+            .data(count)
+            .send()
+        return
+    }
+
+    r.status.ERROR()
+        .message('Internal Server Error')
+        .send()
+}

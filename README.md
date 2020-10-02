@@ -1,8 +1,15 @@
 # Complaint Management System
 
-Backend API of Public complaint Management System
-at Galle District Secretariat Office
+Backend API of Public complaint Management System at Galle District Secretariat Office.
 
+# Temporary Remote Database
+```bash
+mysql -h sql12.freemysqlhosting.net -u sql12368059 -pjIlTR1bB9p -D sql12368059
+source ./src/database/migration/schema.sql
+source ./src/database/migration/insert.sql
+```
+
+---
 # End Points
 
 #### API-USER
@@ -19,6 +26,7 @@ at Galle District Secretariat Office
 - POST add
 - GET get-customer/?query
 - PUT update-customer/:customerId
+- GET count
 
 #### API-COMPLAINT
 - POST add-complaint
@@ -27,6 +35,7 @@ at Galle District Secretariat Office
 - GET get-attachments/:complaintId
 - GET get-complaint-log/:complaintId
 - PUT update-status/:complaintId
+- GET get-count/?query
 
 #### API-UTILS
 - POST add-div
@@ -38,8 +47,77 @@ at Galle District Secretariat Office
 - GET /attachment/:attachmentId
 - POST /upload/attachment
 
+---
+# Business Login Models
 
-Database Details
-> mysql -h sql12.freemysqlhosting.net -u sql12368059 -pjIlTR1bB9p -D sql12368059
-> source ./src/database/migration/schema.sql
-> source ./src/database/migration/insert.sql
+## User Roles
+- Administrator
+- District Officer
+- District Secretariat
+- Divisional Officer
+- Divisional Secretariat
+
+## Complaint states
+- Draft
+- Awaiting Approval
+- Approved
+- Awaiting Accept
+- In Progress
+- Awaiting Div Sec Review
+- Div Sec Reviewed
+- Awaiting Dis Sec Reviewed
+- Dis Sec Reviewed
+- Solved
+- Rejected
+
+## Complaint Types
+- Direct
+- By Presidential Office
+- By Prime Minister Office
+- Third-party Department
+
+## User Fields
+
+### Credentials
+- username
+- password
+- verified
+
+### Details
+- User ID
+- First Name
+- Last Name
+- Role
+- Email
+- Telephone
+- Office
+
+## Customer Fields
+- Customer ID
+- Full Name
+- NIC
+- Email
+- Telephone
+- Address
+- Divisional Office
+- Grama Niladhari Office
+
+## Divisional | Grama Niladhari Office Fields
+- Name
+- Address
+
+## Complaint Fields
+- Complaint ID
+- Ref No
+- Type
+- Customer ID
+- Subject
+- Description
+- Status
+- Created Date
+- Assigned Division
+- Assigned By
+- Assigned Date
+
+
+

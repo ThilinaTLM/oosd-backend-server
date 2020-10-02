@@ -7,6 +7,7 @@ export const ModelErrorSet = {
     CONNECTION_FAILED: "Cannot connect with database",
     WRONG_ARGUMENTS: "Incorrect arguments",
     NO_ENTRY_FOUND: "No entry found",
-    DUPLICATE: "Duplicate entry"
+    DUPLICATE: "Duplicate entry",
+    HAS_RELATIONSHIP: "Entry have relationships with some others"
 }
 

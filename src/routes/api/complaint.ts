@@ -9,5 +9,6 @@ comRouter.post("/add-attachment/:complaintId/:attachmentId", complaint.addAttach
 comRouter.get("/get-complaint", complaint.getComplaint);
 comRouter.get("/get-attachments/:complaintId", complaint.getComplaint);
 comRouter.get("/get-complaint-log/:complaintId", complaint.getComplaint);
+comRouter.get('/get-count', complaint.getCount)
 
 comRouter.put("/update-status/:complaintId", complaint.updateComplaintStatus);

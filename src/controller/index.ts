@@ -11,7 +11,7 @@ import {
 } from "./user";
 import {
     addCustomer,
-    getCustomer,
+    getCustomer, getCustomerCount,
     updateCustomer
 } from "./customer";
 import {
@@ -51,7 +51,8 @@ export const user = {
 export const customer = {
     add: addCustomer as Handler,
     get: getCustomer as Handler,
-    update: updateCustomer as Handler
+    update: updateCustomer as Handler,
+    count: getCustomerCount as Handler
 };
 
 /**
@@ -63,7 +64,8 @@ export const complaint = {
     addAttachment: addAttachment as Handler,
     getAttachments: getAttachments as Handler,
     getComplaintLog: getComplaintLog as Handler,
-    updateComplaintStatus: updateComplaintStatus as Handler
+    updateComplaintStatus: updateComplaintStatus as Handler,
+    getCount: getCustomerCount as Handler
 };
 
 /**
