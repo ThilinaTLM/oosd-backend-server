@@ -1,6 +1,7 @@
 export const COMPLAINT_TYPES = {
-    DIRECT: "Direct",
+    DIRECT_TO_DIV: "Direct to Division",
+    DIRECT_TO_DIS: "Direct to District",
     PRESIDENT: "By Presidential Office",
     PRIME_MINISTER: "By Prime Minister Office",
-    OTHER: "Third-party Department"
+    OTHER: "By Third-party Department"
 }

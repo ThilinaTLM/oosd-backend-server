@@ -1,4 +1,4 @@
-import {  Handler } from "../../core";
+import { Handler } from "../../core";
 import { MErr, model } from "../../database";
 
 export const addComplaint: Handler = async (req, res) => {
@@ -13,6 +13,44 @@ export const addComplaint: Handler = async (req, res) => {
             .send();
         return;
     }
+
+    if (error === MErr.NO_ERRORS) {
+        r.status.OK()
+            .message("Draft complaint added!")
+            .data(complaintId)
+            .send();
+        return;
+    }
+
+    r.send_ISE();
+};
+
+export const assignDivision: Handler = async (req, res) => {
+    const { r } = res;
+    const data = req.body;
+    const { complaintId } = req.params;
+    const {userId} = req.user
+
+    const error = await model.complaint.assignDivision(complaintId, data.division, userId);
+
+    if (error === MErr.NO_ERRORS) {
+        r.status.OK()
+            .message("Draft complaint added!")
+            .data(complaintId)
+            .send();
+        return;
+    }
+
+    r.send_ISE();
+};
+
+export const reAssignDivision: Handler = async (req, res) => {
+    const { r } = res;
+    const data = req.body;
+    const { complaintId } = req.params;
+    const {userId} = req.user
+
+    const error = await model.complaint.updateDivisionAssignment(complaintId, data.division, userId);
 
     if (error === MErr.NO_ERRORS) {
         r.status.OK()

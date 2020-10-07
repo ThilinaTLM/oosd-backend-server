@@ -20,10 +20,11 @@ INSERT INTO complaint_states VALUES ('Solved', '');
 INSERT INTO complaint_states VALUES ('Rejected', '');
 
 -- Complaint Types
-INSERT INTO complaint_types VALUES ('Direct', '');
+INSERT INTO complaint_types VALUES ('Direct to District', '');
+INSERT INTO complaint_types VALUES ('Direct to Division', '');
 INSERT INTO complaint_types VALUES ('By Presidential Office', '');
 INSERT INTO complaint_types VALUES ('By Prime Minister Office', '');
-INSERT INTO complaint_types VALUES ('Third-party Department', '');
+INSERT INTO complaint_types VALUES ('By Third-party Department', '');
 
 -- Users
 INSERT INTO users VALUES ('f1d41c52-2219-4bee-8aa0-035c2a16e786', 'Administrator', 'Admin', 'User', '', '', NULL);
