@@ -1,37 +1,68 @@
 
--- clean create database cms -------------------------------------------------------------------------------------------
+-- Clean Database -------------------------------------------------------------------------------------------
+DROP PROCEDURE IF EXISTS AddAccount;
+DROP PROCEDURE IF EXISTS AddComplaint;
+DROP PROCEDURE IF EXISTS AssignDivision;
+DROP PROCEDURE IF EXISTS UpdateDivision;
+DROP PROCEDURE IF EXISTS UpdateComplaint;
 
---DROP SCHEMA IF EXISTS cms ;
---CREATE SCHEMA IF NOT EXISTS cms ;
---USE cms;
+DROP FUNCTION IF EXISTS GenerateReferenceNo;
+
+DROP VIEW IF EXISTS accounts;
+DROP VIEW IF EXISTS complaints_with_divisions;
 
 DROP TABLE IF EXISTS notifications;
-DROP TABLE IF EXISTS complaint_log;
 DROP TABLE IF EXISTS complaint_attachment;
 DROP TABLE IF EXISTS attachments;
-DROP TABLE IF EXISTS complaints ;
-DROP TABLE IF EXISTS complaint_types;
+DROP TABLE IF EXISTS complaint_log;
+DROP TABLE IF EXISTS complaint_assignment;
+DROP TABLE IF EXISTS complaints;
+
 DROP TABLE IF EXISTS credentials;
-DROP TABLE IF EXISTS users ;
-DROP TABLE IF EXISTS user_roles ;
+DROP TABLE IF EXISTS users;
+
 DROP TABLE IF EXISTS customers;
+
 DROP TABLE IF EXISTS grama_niladhari_offices;
 DROP TABLE IF EXISTS divisional_offices;
 
-DROP PROCEDURE IF EXISTS AddAccount;
-DROP PROCEDURE IF EXISTS UpdateComplaint ;
+DROP TABLE IF EXISTS user_roles;
+DROP TABLE IF EXISTS complaint_states;
+DROP TABLE IF EXISTS complaint_types;
 
 -- ---------------------------------------------------------------------------------------------------------------------
---  _______    _     _
--- |__   __|  | |   | |
---    | | __ _| |__ | | ___  ___
---    | |/ _` | '_ \| |/ _ \/ __|
---    | | (_| | |_) | |  __/\__ \
---    |_|\__,_|_.__/|_|\___||___/
+--                                     ____   __    ____  __    ____  ___
+--                                    (_  _) /__\  (  _ \(  )  ( ___)/ __)
+--                                      )(  /(__)\  ) _ < )(__  )__) \__ \
+--                                     (__)(__)(__)(____/(____)(____)(___/
 -- ---------------------------------------------------------------------------------------------------------------------
+
+-- complaint types -----------------------------------------------------------------------------------------------------
+CREATE TABLE complaint_types (
+	type VARCHAR(50),
+	description VARCHAR(255),
+
+	PRIMARY KEY(type)
+) ENGINE = InnoDB;
+
+-- complaint states ----------------------------------------------------------------------------------------------------
+CREATE TABLE complaint_states (
+	state VARCHAR(50),
+	description VARCHAR(255),
+
+	PRIMARY KEY(state)
+) ENGINE = InnoDB;
+
+-- users roles ---------------------------------------------------------------------------------------------------------
+CREATE TABLE user_roles (
+  role VARCHAR(100) NOT NULL,
+  description VARCHAR(255),
+
+  PRIMARY KEY (role)
+)
+ENGINE = InnoDB;
 
 -- Divisional Offices --------------------------------------------------------------------------------------------------
-
 CREATE TABLE divisional_offices (
     name VARCHAR(100) NOT NULL,
     address TEXT,
@@ -42,7 +73,6 @@ ENGINE = InnoDB;
 CREATE UNIQUE INDEX name_UNIQUE ON divisional_offices (name ASC );
 
 -- Grama Niladhari Offices ---------------------------------------------------------------------------------------------
-
 CREATE TABLE grama_niladhari_offices (
     name VARCHAR(100) NOT NULL,
     address TEXT,
@@ -53,7 +83,6 @@ ENGINE = InnoDB;
 CREATE UNIQUE INDEX name_UNIQUE ON grama_niladhari_offices (name ASC );
 
 -- Customers -----------------------------------------------------------------------------------------------------------
-
 CREATE TABLE customers (
     customer_id VARCHAR(36) NOT NULL,
     full_name TEXT NOT NULL,
@@ -85,18 +114,7 @@ CREATE UNIQUE INDEX nic_UNIQUE ON customers (nic ASC);
 CREATE INDEX fk_divisional_office_x ON customers (divisional_office ASC);
 CREATE INDEX fk_gn_office_x ON customers (gn_office ASC);
 
--- users roles ---------------------------------------------------------------------------------------------------------
-
-CREATE TABLE user_roles (
-  role VARCHAR(100) NOT NULL,
-  description VARCHAR(255),
-
-  PRIMARY KEY (role)
-)
-ENGINE = InnoDB;
-
 -- users ---------------------------------------------------------------------------------------------------------------
-
 CREATE TABLE users (
   user_id VARCHAR(36) NOT NULL,
   role VARCHAR(100) NOT NULL,
@@ -126,7 +144,6 @@ ENGINE = InnoDB;
 CREATE INDEX fk_office_x ON users (office ASC);
 
 -- credentials ---------------------------------------------------------------------------------------------------------
-
 CREATE TABLE credentials (
     user_id VARCHAR(36),
     username VARCHAR(50) NOT NULL,
@@ -145,30 +162,11 @@ ENGINE = InnoDB;
 
 CREATE UNIQUE INDEX idx_username ON credentials (username ASC);
 
--- complaint types -----------------------------------------------------------------------------------------------------
-
-CREATE TABLE complaint_types (
-	type VARCHAR(50),
-	description VARCHAR(255),
-
-	PRIMARY KEY(type)
-) ENGINE = InnoDB;
-
--- complaint states ----------------------------------------------------------------------------------------------------
-DROP TABLE IF EXISTS complaint_states;
-
-CREATE TABLE complaint_states (
-	state VARCHAR(50),
-	description VARCHAR(255),
-	
-	PRIMARY KEY(state)
-) ENGINE = InnoDB;
 
 -- complaints ----------------------------------------------------------------------------------------------------------
-
 CREATE TABLE complaints (
     complaint_id VARCHAR(36) NOT NULL,
-    ref_no VARCHAR(50),
+    ref_no VARCHAR(50) NOT NULL,
     type VARCHAR(50) NOT NULL,
 
     customer_id VARCHAR(36),
@@ -177,23 +175,7 @@ CREATE TABLE complaints (
     status VARCHAR(50) NOT NULL,
     created_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
 
-    assigned_div VARCHAR(100),
-    assigned_by VARCHAR(36),
-    assigned_date TIMESTAMP NULL,
-
     PRIMARY KEY (complaint_id),
-
-    CONSTRAINT fk_assigned_div
-        FOREIGN KEY (assigned_div)
-        REFERENCES divisional_offices (name)
-        ON DELETE NO ACTION
-        ON UPDATE NO ACTION,
-
-    CONSTRAINT fk_assigned_by
-        FOREIGN KEY (assigned_by)
-        REFERENCES users (user_id)
-        ON DELETE NO ACTION
-        ON UPDATE NO ACTION,
 
     CONSTRAINT fk_customer
         FOREIGN KEY (customer_id)
@@ -214,13 +196,60 @@ CREATE TABLE complaints (
         ON UPDATE NO ACTION
 ) ENGINE = InnoDB;
 
-CREATE INDEX fk_submit_by_idx ON complaints (assigned_by ASC);
 CREATE INDEX fk_customer_idx ON complaints (customer_id ASC);
-CREATE INDEX fk_assign_to_idx ON complaints (assigned_div ASC);
-CREATE INDEX fk_status_x ON complaint_states ( state ASC);
+CREATE INDEX fk_status_x ON complaints ( status ASC);
+CREATE UNIQUE INDEX ref_no_unique ON complaints (ref_no ASC);
+
+-- complaint division --------------------------------------------------------------------------------------------------
+CREATE TABLE complaint_assignment (
+    complaint_id VARCHAR(36) NOT NULL,
+    assigned_div VARCHAR(100) NOT NULL,
+    assigned_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+
+    PRIMARY KEY(complaint_id),
+
+    CONSTRAINT fk_assigned_div
+        FOREIGN KEY (assigned_div)
+        REFERENCES divisional_offices (name)
+        ON DELETE NO ACTION
+        ON UPDATE NO ACTION,
+
+    CONSTRAINT fk_ca_complaint_id
+        FOREIGN KEY (complaint_id)
+        REFERENCES complaints (complaint_id)
+        ON DELETE NO ACTION
+        ON UPDATE NO ACTION
+) ENGINE = InnoDB;
+
+CREATE INDEX fk_assign_to_idx ON complaint_assignment (assigned_div ASC);
+
+-- complaint log -------------------------------------------------------------------------------------------------------
+CREATE TABLE complaint_log (
+    id INT UNSIGNED AUTO_INCREMENT,
+    complaint_id VARCHAR(36) NOT NULL,
+    update_by VARCHAR(36), -- user id
+    update_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP(),
+    subject VARCHAR(255),
+    description TEXT,
+
+    PRIMARY KEY(id),
+
+    CONSTRAINT fk_log_complaint_id
+        FOREIGN KEY (complaint_id)
+        REFERENCES complaints (complaint_id)
+        ON DELETE NO ACTION
+        ON UPDATE NO ACTION,
+
+    CONSTRAINT fk_log_complaint_updater
+            FOREIGN KEY (update_by)
+            REFERENCES users (user_id)
+            ON DELETE NO ACTION
+            ON UPDATE NO ACTION
+) ENGINE = InnoDB;
+
+CREATE INDEX fk_cl_com_id_idx ON complaint_log (complaint_id ASC);
 
 -- attachments ---------------------------------------------------------------------------------------------------------
-
 CREATE TABLE attachments (
     attachment_id VARCHAR(36),
     original_name VARCHAR(255),
@@ -229,7 +258,6 @@ CREATE TABLE attachments (
 ) ENGINE = InnoDB;
 
 -- attachment complaint -------------------------------------------------------------------------------------------------------
-
 CREATE TABLE complaint_attachment (
     complaint_id VARCHAR(36),
     attachment_id VARCHAR(36),
@@ -249,41 +277,9 @@ CREATE TABLE complaint_attachment (
                 ON UPDATE NO ACTION
 ) ENGINE = InnoDB;
 
--- complaint log -------------------------------------------------------------------------------------------------------
+CREATE INDEX fk_ca_com_id_idx ON complaint_attachment (complaint_id ASC);
 
-CREATE TABLE complaint_log (
-    id INT UNSIGNED AUTO_INCREMENT,
-    complaint_id VARCHAR(36) NOT NULL,
-    update_by VARCHAR(36), -- user id
-    update_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    previous_state VARCHAR(50), 
-    next_state VARCHAR(50),
-    subject VARCHAR(255),
-    description TEXT,
-    
-    PRIMARY KEY(id),
-
-    CONSTRAINT fk_log_complaint_id
-        FOREIGN KEY (complaint_id)
-        REFERENCES complaints (complaint_id)
-        ON DELETE NO ACTION
-        ON UPDATE NO ACTION,
-    
-    CONSTRAINT fk_pre_state
-    	FOREIGN KEY (previous_state)
-    	REFERENCES complaint_states (state)
-    	ON DELETE NO ACTION
-        ON UPDATE NO ACTION,
-        
-    CONSTRAINT fk_next_state
-    	FOREIGN KEY (next_state)
-    	REFERENCES complaint_states (state)
-    	ON DELETE NO ACTION
-        ON UPDATE NO ACTION
-) ENGINE = InnoDB;
-    
 -- notifications -------------------------------------------------------------------------------------------------------
-
 CREATE TABLE notifications (
     notification_id VARCHAR(36) NOT NULL,
     user_id VARCHAR(36) NOT NULL,
@@ -304,13 +300,61 @@ CREATE TABLE notifications (
 CREATE INDEX fk_notification_user_idx ON notifications (user_id ASC);
 
 -- ---------------------------------------------------------------------------------------------------------------------
---  _____                        _
--- |  __ \                      | |
--- | |__) | __ ___   ___ ___  __| |_   _ _ __ ___  ___
--- |  ___/ '__/ _ \ / __/ _ \/ _` | | | | '__/ _ \/ __|
--- | |   | | | (_) | (_|  __/ (_| | |_| | | |  __/\__ \
--- |_|   |_|  \___/ \___\___|\__,_|\__,_|_|  \___||___/
---
+--                                     _  _  ____  ____  _    _  ___
+--                                    ( \/ )(_  _)( ___)( \/\/ )/ __)
+--                                     \  /  _)(_  )__)  )    ( \__ \
+--                                      \/  (____)(____)(__/\__)(___/
+-- ---------------------------------------------------------------------------------------------------------------------
+
+CREATE VIEW accounts AS
+    SELECT  u.*, c.username, c.hash, c.verified
+    FROM users u
+    LEFT JOIN credentials c ON c.user_id = u.user_id;
+
+CREATE VIEW complaints_with_divisions AS
+    SELECT c.*, ca.assigned_div, ca.assigned_date
+    FROM complaints c
+    LEFT JOIN complaint_assignment ca ON ca.complaint_id = c.complaint_id;
+
+-- ---------------------------------------------------------------------------------------------------------------------
+--                         ____  __  __  _  _  ___  ____  ____  _____  _  _  ___
+--                        ( ___)(  )(  )( \( )/ __)(_  _)(_  _)(  _  )( \( )/ __)
+--                         )__)  )(__)(  )  (( (__   )(   _)(_  )(_)(  )  ( \__ \
+--                        (__)  (______)(_)\_)\___) (__) (____)(_____)(_)\_)(___/
+-- ---------------------------------------------------------------------------------------------------------------------
+
+DELIMITER //
+
+CREATE FUNCTION GenerateReferenceNo (
+    type VARCHAR(50)
+)
+RETURNS VARCHAR(50)
+BEGIN
+    DECLARE datetime_now TIMESTAMP;
+    DECLARE this_month, this_year VARCHAR(2);
+    DECLARE pointer, preText VARCHAR(4);
+
+    SET datetime_now = CURRENT_TIMESTAMP();
+    SET this_month = CAST(EXTRACT(MONTH FROM CURRENT_TIMESTAMP()) AS CHAR(2));
+    SET this_year = SUBSTRING( CAST(EXTRACT(YEAR FROM datetime_now) AS CHAR(4)) , 3, 2);
+    SELECT LPAD(CAST((COUNT(*) + 1) AS CHAR(4)), 4, 0) INTO pointer FROM complaints WHERE type = type AND (EXTRACT(MONTH FROM created_date) = EXTRACT(MONTH FROM datetime_now));
+
+    IF type = 'Direct to District' THEN
+        SET preText = 'DDIS';
+    ELSEIF type = 'Direct to Division' THEN
+        SET preText = 'DDIV';
+    END IF;
+
+    RETURN CONCAT(preText, '/', this_year, '/', this_month, '/', pointer );
+END //
+
+DELIMITER ;
+
+-- ---------------------------------------------------------------------------------------------------------------------
+--                     ____  ____  _____  ___  ____  ____  __  __  ____  ____  ___
+--                    (  _ \(  _ \(  _  )/ __)( ___)(  _ \(  )(  )(  _ \( ___)/ __)
+--                     )___/ )   / )(_)(( (__  )__)  )(_) ))(__)(  )   / )__) \__ \
+--                    (__)  (_)\_)(_____)\___)(____)(____/(______)(_)\_)(____)(___/
 -- ---------------------------------------------------------------------------------------------------------------------
 
 -- Add Account ---------------------------------------------------------------------------------------------------------
@@ -338,6 +382,79 @@ END //
 
 DELIMITER ;
 
+-- Add a new Complaint : Direct Division ---------------------------------------------------------------------------------------------
+
+DELIMITER //
+
+CREATE PROCEDURE AddComplaint (
+    IN complaint_id VARCHAR(36),
+    IN ref_no VARCHAR(50), -- auto or refNo
+    IN type VARCHAR(36),
+
+    IN customer_id VARCHAR(36),
+    IN subject VARCHAR(255),
+    IN description TEXT,
+    IN assigned_div VARCHAR(100) -- none or Division
+)
+BEGIN
+
+    IF ref_no = 'auto' THEN
+       SELECT GenerateReferenceNo(type) INTO ref_no;
+    END IF;
+
+    INSERT INTO complaints
+        VALUES (complaint_id, ref_no, type, customer_id, subject, description, 'Draft', CURRENT_TIMESTAMP());
+
+    IF EXISTS(SELECT * FROM divisional_offices WHERE name = assigned_div) THEN
+        INSERT INTO complaint_assignment VALUES (complaint_id, assigned_div, CURRENT_TIMESTAMP());
+    END IF;
+
+END //
+
+DELIMITER ;
+
+-- Assign Division in Complaint ---------------------------------------------------------------------------------------------
+
+DELIMITER //
+
+CREATE PROCEDURE AssignDivision (
+    IN complaint_id VARCHAR(36),
+    IN assigned_div VARCHAR(100),
+    IN user_id VARCHAR(36)
+)
+BEGIN
+    INSERT INTO complaint_assignment VALUES (complaint_id, assigned_div, CURRENT_TIMESTAMP());
+    INSERT INTO complaint_log (complaint_id, update_by, update_at, subject, description)
+                    VALUES (complaint_id, user_id, CURRENT_TIMESTAMP(),
+                    'Assigned to Division',
+                    'Complaint is assigned to a divisional secretariat office.');
+END //
+
+DELIMITER ;
+
+-- Update Assigned Division in Complaint ---------------------------------------------------------------------------------------------
+
+DELIMITER //
+
+CREATE PROCEDURE UpdateDivision (
+    IN complaint_id VARCHAR(36),
+    IN assigned_div VARCHAR(100),
+    IN user_id VARCHAR(36)
+)
+BEGIN
+    UPDATE complaint_assignment
+        SET assigned_div = assigned_div,
+            assigned_date = CURRENT_TIMESTAMP()
+        WHERE complaint_id = complaint_id;
+
+    INSERT INTO complaint_log (complaint_id, update_by, update_at, subject, description)
+        VALUES ( complaint_id, user_id, CURRENT_TIMESTAMP(),
+        'Reassigned to Division',
+        'Divisional secretariat office assignment of the complaint is updated.');
+END //
+
+DELIMITER ;
+
 -- Update Complaint Status ---------------------------------------------------------------------------------------------
 
 DELIMITER //
@@ -358,14 +475,13 @@ BEGIN
         complaint_id,
         user_id,
         CURRENT_TIMESTAMP,
-        previous_state,
-        status,
         subject,
         description
     );
 
-    UPDATE complaints SET status = status WHERE complaint_id = complaint_id;
-
+    IF (previous_state != status) AND EXISTS(SELECT * FROM complaint_states WHERE state = status) THEN
+        UPDATE complaints SET status = status WHERE complaint_id = complaint_id;
+    END IF;
 END //
 
 DELIMITER ;

@@ -10,10 +10,13 @@ import { attachmentUpload } from "./uploader/uploader";
 export const ABuilder = () => new AuthBuilder();
 export const preBuilt = {
     ALL_ROLES: ABuilder().build(),
+    ALL_ROLES_NOT_STRICT: ABuilder().disableToken().build(),
+
     ONLY_ADMIN: ABuilder().allow.ADMIN().build(),
     ONLY_DIS_OFFICER: ABuilder().allow.DIS_OCR().build(),
     ONLY_DIS_SEC: ABuilder().allow.DIS_SEC().build(),
-    ALL_ROLES_NOT_STRICT: ABuilder().disableToken().build()
+
+    ONLY_OFFICER: ABuilder().allow.DIV_OCR().allow.DIS_OCR().build()
 };
 
 /**
