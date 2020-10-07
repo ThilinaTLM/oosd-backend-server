@@ -26,7 +26,10 @@ import {
     getComplaint,
     getAttachments,
     getComplaintLog,
-    updateComplaintStatus
+    updateComplaintStatus,
+    assignDivision,
+    getComplaintCount,
+    reAssignDivision
 } from "./complaint";
 
 import { getAttachment, uploadAttachment } from "./file";
@@ -65,7 +68,10 @@ export const complaint = {
     getAttachments: getAttachments as Handler,
     getComplaintLog: getComplaintLog as Handler,
     updateComplaintStatus: updateComplaintStatus as Handler,
-    getCount: getCustomerCount as Handler
+    getCount: getCustomerCount as Handler,
+    assignDivision: assignDivision as Handler,
+    getComplaintCount: getComplaintCount as Handler,
+    reAssignDivision: reAssignDivision as Handler
 };
 
 /**

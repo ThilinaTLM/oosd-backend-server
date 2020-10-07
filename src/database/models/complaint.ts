@@ -141,7 +141,7 @@ export const complaint = {
         const args = [
             complaintId,
             userId,
-            data.status,
+            data.status || 'none',
             data.subject,
             data.description
         ];
