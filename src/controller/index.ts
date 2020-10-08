@@ -55,7 +55,7 @@ export const customer = {
     add: addCustomer as Handler,
     get: getCustomer as Handler,
     update: updateCustomer as Handler,
-    count: getCustomerCount as Handler
+    count: getCustomerCount as Handler,
 };
 
 /**
@@ -68,9 +68,8 @@ export const complaint = {
     getAttachments: getAttachments as Handler,
     getComplaintLog: getComplaintLog as Handler,
     updateComplaintStatus: updateComplaintStatus as Handler,
-    getCount: getCustomerCount as Handler,
     assignDivision: assignDivision as Handler,
-    getComplaintCount: getComplaintCount as Handler,
+    getCount: getComplaintCount as Handler,
     reAssignDivision: reAssignDivision as Handler
 };
 

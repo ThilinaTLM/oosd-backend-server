@@ -100,9 +100,13 @@ export const utils = {
     },
 
     getCount: async (table: string, condition: any = {}): Promise<[ModelError, number]> => {
-        const [error, count] = await mysqlExeEW.run(
+        const [error, res] = await mysqlExeEW.run(
             ...QBuild.COUNT(table, condition)
         )
+
+        let count = 0
+        if (error === "")
+            count = res[0][0]["COUNT(*)"]
 
         return [error, count]
     }

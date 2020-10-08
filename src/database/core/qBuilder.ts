@@ -43,7 +43,7 @@ export const QBuild = {
     UPDATE(table: string, data: DataObject, condition: DataObject): [string, Array<DataObjectValue>] {
         const sets = [], where = [], values = [];
         for (let k in data) {
-            sets.push(`SET ${k} = ?`);
+            sets.push(`${k} = ?`);
             values.push(data[k]);
         }
 
@@ -53,7 +53,7 @@ export const QBuild = {
         }
 
         return [
-            `UPDATE ${table} ${sets.join(", ")} WHERE ${where.join(" AND ")}`,
+            `UPDATE ${table} SET ${sets.join(", ")} WHERE ${where.join(" AND ")}`,
             values
         ];
 

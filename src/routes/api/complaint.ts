@@ -15,7 +15,7 @@ export const comRouter = Router();
  *      description*
  *      assignedDiv
  */
-comRouter.post("add-complaint", preBuilt.ALL_ROLES, complaint.addComplaint);
+comRouter.post("/add-complaint", complaint.addComplaint);
 
 /**
  * Type : POST
@@ -23,13 +23,21 @@ comRouter.post("add-complaint", preBuilt.ALL_ROLES, complaint.addComplaint);
  * REQ BODY :
  *      division*
  */
-comRouter.post("assign-div/:complaintId", preBuilt.ALL_ROLES, complaint.assignDivision)
+comRouter.post("/assign-div/:complaintId", preBuilt.ALL_ROLES, complaint.assignDivision)
 
-comRouter.post("add-attachment/:complaintId/:attachmentId", complaint.addAttachment);
+/**
+ * Type : PUT
+ * URL : api/complaint/reassign-div/:complaintId
+ * REQ BODY :
+ *      division*
+ */
+comRouter.put("/reassign-div/:complaintId", preBuilt.ALL_ROLES, complaint.reAssignDivision)
+
+comRouter.post("/add-attachment/:complaintId", complaint.addAttachment);
 
 comRouter.get("/get-complaint", complaint.getComplaint);
-comRouter.get("/get-attachments/:complaintId", complaint.getComplaint);
-comRouter.get("/get-complaint-log/:complaintId", complaint.getComplaint);
+comRouter.get("/get-attachments/:complaintId", complaint.getAttachments);
+comRouter.get("/get-complaint-log/:complaintId", complaint.getComplaintLog);
 comRouter.get('/get-count', complaint.getCount)
 
 /**
@@ -40,12 +48,5 @@ comRouter.get('/get-count', complaint.getCount)
  *      subject*
  *      description*
  */
-comRouter.put("/update-status/:complaintId", complaint.updateComplaintStatus);
+comRouter.put("/update-status/:complaintId", preBuilt.ALL_ROLES, complaint.updateComplaintStatus);
 
-/**
- * Type : PUT
- * URL : api/complaint/assign-div/:complaintId
- * REQ BODY :
- *      division*
- */
-comRouter.put("/assign-div/:complaintId", preBuilt.ALL_ROLES, complaint.reAssignDivision)

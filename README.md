@@ -4,7 +4,9 @@ Backend API of Public complaint Management System at Galle District Secretariat 
 
 # Temporary Remote Database
 ```bash
-mysql -h sql12.freemysqlhosting.net -u sql12368059 -pjIlTR1bB9p -D sql12368059
+mysql -h sql12.freemysqlhosting.net -u sql12369606 -pPU3MyFCCf7 -D sql12369606 | (2020-10-08)
+mysql -h db4free.net -u thilinatlm2 -pTLM98@mysql -D cms_dev_oosd
+mysql -u tlm -p12345 -D cms
 source ./src/database/migration/schema.sql
 source ./src/database/migration/insert.sql
 ```
@@ -71,7 +73,8 @@ source ./src/database/migration/insert.sql
 - Rejected
 
 ## Complaint Types
-- Direct
+- Direct to Division
+- Direct to District
 - By Presidential Office
 - By Prime Minister Office
 - Third-party Department

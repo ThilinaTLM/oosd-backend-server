@@ -271,7 +271,7 @@ CREATE TABLE complaint_attachment (
             ON UPDATE NO ACTION,
 
     CONSTRAINT fk_ac_att_id
-                FOREIGN KEY (complaint_id)
+                FOREIGN KEY (attachment_id)
                 REFERENCES attachments(attachment_id)
                 ON DELETE NO ACTION
                 ON UPDATE NO ACTION
@@ -465,13 +465,14 @@ CREATE PROCEDURE UpdateComplaint (
 
     IN status VARCHAR(50),
     IN subject VARCHAR(255),
-    IN description VARCHAR(100)
+    IN description TEXT
 )
 BEGIN
-    DECLARE previous_state VARCHAR(50);
-    SELECT status INTO previous_state FROM complaints WHERE complaint_id = complaint_id;
+--    DECLARE previous_state VARCHAR(50);
+--    SELECT status INTO previous_state FROM complaints WHERE complaint_id = complaint_id;
 
-    INSERT INTO complaint_log VALUES (
+    INSERT INTO complaint_log (complaint_id, update_by, update_at, subject, description)
+    VALUES (
         complaint_id,
         user_id,
         CURRENT_TIMESTAMP,
@@ -479,7 +480,8 @@ BEGIN
         description
     );
 
-    IF (previous_state != status) AND EXISTS(SELECT * FROM complaint_states WHERE state = status) THEN
+--    IF (previous_state != status) AND EXISTS(SELECT * FROM complaint_states WHERE state = status) THEN
+    IF EXISTS(SELECT * FROM complaint_states WHERE state = status) THEN
         UPDATE complaints SET status = status WHERE complaint_id = complaint_id;
     END IF;
 END //

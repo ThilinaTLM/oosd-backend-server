@@ -146,6 +146,8 @@ export const complaint = {
             data.description
         ];
 
+        console.log(args, QBuild.ARGS_STRING(args.length))
+
         const [error] = await mysqlExeEW.run(
             `CALL UpdateComplaint(${QBuild.ARGS_STRING(args.length)})`,
             args

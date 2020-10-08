@@ -33,9 +33,16 @@ export const assignDivision: Handler = async (req, res) => {
 
     const error = await model.complaint.assignDivision(complaintId, data.division, userId);
 
+    if (error === MErr.DUPLICATE) {
+        r.status.BAD_REQ()
+            .message("Already assigned")
+            .send();
+        return;
+    }
+
     if (error === MErr.NO_ERRORS) {
         r.status.OK()
-            .message("Draft complaint added!")
+            .message("Assigned to the divisional office")
             .data(complaintId)
             .send();
         return;
@@ -54,7 +61,7 @@ export const reAssignDivision: Handler = async (req, res) => {
 
     if (error === MErr.NO_ERRORS) {
         r.status.OK()
-            .message("Draft complaint added!")
+            .message("Assigned to the divisional office")
             .data(complaintId)
             .send();
         return;
@@ -65,7 +72,8 @@ export const reAssignDivision: Handler = async (req, res) => {
 
 export const addAttachment: Handler = async (req, res) => {
     const { r } = res;
-    const { complaintId, attachmentId } = req.params;
+    const { complaintId } = req.params;
+    const attachmentId = req.body.attachmentId
 
     const error = await model.complaint.addAttachment(complaintId, attachmentId);
 

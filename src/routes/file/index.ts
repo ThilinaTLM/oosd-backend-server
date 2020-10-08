@@ -17,4 +17,4 @@ fileRouter.get('/attachment/:attachmentId',  preBuilt.ALL_ROLES, file.getAttachm
 /**
  * Single file upload
  */
-fileRouter.post('/upload/attachment', preBuilt.ALL_ROLES, attachmentParser, file.addAttachment);
+fileRouter.post('/upload/attachment', attachmentParser, file.addAttachment);
