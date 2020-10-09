@@ -7,7 +7,7 @@
         "build": "tsc --build ./tsconfig.json",
         "start": "node dist/main.js",
         "dev": "ts-node src/main.ts",
-        "clean": "rm -drf ./dist"
+        "clean": "rm -drf ./dist && rm ./uploads/attachments/* && mkdir -p uploads/attachments"
     },
     "author": "Thilina Lakshan (TLM)",
     "license": "MIT",

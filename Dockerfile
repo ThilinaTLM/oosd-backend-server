@@ -18,6 +18,4 @@ RUN npm install -g typescript
 
 RUN npm run build
 EXPOSE 8000
-CMD [ "rm", "-drf", "uploads"]
-CMD [ "mkdir", "-p", "uploads/attachments"]
 CMD [ "node", "dist/main.js" ]

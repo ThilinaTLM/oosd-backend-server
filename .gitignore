@@ -7,7 +7,6 @@ test
 .env
 .vscode
 .idea
-uploads
 
 # pkg manager files
 yarn.lock

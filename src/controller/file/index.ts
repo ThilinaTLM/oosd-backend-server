@@ -1,6 +1,4 @@
-import { static as fileHandler, Express } from "express";
-import multer, { FileFilterCallback } from "multer";
-import { join, extname } from "path";
+import { join } from "path";
 import { Handler } from "../../core";
 import { MErr, model } from "../../database";
 
