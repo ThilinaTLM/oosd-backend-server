@@ -101,7 +101,6 @@ export const user = {
     },
 
     updateCredentials: async (userId: string, data: any): Promise<ModelError> => {
-
         const [error, _] = await mysqlExeEW.run(...QBuild.UPDATE("credentials", data , { user_id: userId }));
         return error;
     },

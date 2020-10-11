@@ -12,6 +12,8 @@ DROP PROCEDURE IF EXISTS UpdateComplaint;
 DROP PROCEDURE IF EXISTS UpdateComplaintStatus;
 DROP PROCEDURE IF EXISTS UpdateComplaintLog;
 
+DROP FUNCTION IF EXISTS GetAttachmentsAsArray;
+DROP FUNCTION IF EXISTS GetLogsAsArray;
 DROP FUNCTION IF EXISTS GetUserFullName;
 DROP FUNCTION IF EXISTS GenerateReferenceNo;
 
@@ -335,6 +337,7 @@ BEGIN
     RETURN CONCAT(preText, '/', this_year, '/', this_month, '/', pointer );
 END //
 
+
 CREATE FUNCTION GetUserFullName (
     user_id VARCHAR(36)
 )
@@ -343,6 +346,34 @@ BEGIN
 	DECLARE full_name VARCHAR(100);
 	SELECT CONCAT(first_name, ' ', last_name) INTO full_name FROM users u WHERE u.user_id = user_id LIMIT 1;
     RETURN full_name;
+END //
+
+CREATE FUNCTION GetLogsAsArray (
+    complaint_id VARCHAR(36)
+)
+RETURNS JSON
+BEGIN
+    DECLARE logs JSON;
+	SELECT CONCAT( '[', GROUP_CONCAT(JSON_OBJECT(
+            		'subject', cl.subject,
+            		'description', cl.description,
+            		'update_by', cl.update_by,
+            		'update_by_name', GetUserFullName(cl.update_by),
+            		'update_at', cl.update_at
+            	)), ']') INTO logs
+            	FROM complaint_log cl WHERE cl.complaint_id = complaint_id GROUP BY cl.complaint_id;
+    RETURN logs;
+END //
+
+CREATE FUNCTION GetAttachmentsAsArray (
+    complaint_id VARCHAR(36)
+)
+RETURNS JSON
+BEGIN
+    DECLARE attachments JSON;
+	SELECT CONCAT( '[', GROUP_CONCAT( CONCAT('"', ca.attachment_id, '"')), ']') INTO attachments
+            FROM complaint_attachment ca WHERE ca.complaint_id = complaint_id GROUP BY ca.complaint_id;
+    RETURN attachments;
 END //
 
 DELIMITER ;
@@ -530,25 +561,7 @@ CREATE VIEW complaint_full_details AS
     	c.*,
     	ca.assigned_div,
     	ca.assigned_date,
-    	log_data.logs,
-    	att_data.attachments
+    	GetLogsAsArray(c.complaint_id) AS logs,
+    	GetAttachmentsAsArray(c.complaint_id) AS attachments
     FROM complaints c
-    LEFT JOIN complaint_assignment ca ON ca.complaint_id = c.complaint_id
-    LEFT JOIN (
-    	SELECT
-    		complaint_id,
-    		CONCAT( '[', GROUP_CONCAT(DISTINCT JSON_OBJECT(
-        		'subject', cl.subject,
-        		'description', cl.description,
-        		'update_by', cl.update_by,
-        		'update_by_name', GetUserFullName(cl.update_by),
-        		'update_at', cl.update_at
-        	)), ']') AS logs
-        	FROM complaint_log cl GROUP BY cl.complaint_id
-    ) log_data ON log_data.complaint_id = c.complaint_id
-    LEFT JOIN (
-    	SELECT
-    		complaint_id,
-    		CONCAT( '[', GROUP_CONCAT( CONCAT('"', ca.attachment_id, '"')), ']') AS attachments
-        	FROM complaint_attachment ca GROUP BY ca.complaint_id
-    ) att_data ON att_data.complaint_id = c.complaint_id;
+    LEFT JOIN complaint_assignment ca ON ca.complaint_id = c.complaint_id;

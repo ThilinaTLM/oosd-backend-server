@@ -4,7 +4,8 @@ Backend API of Public complaint Management System at Galle District Secretariat 
 
 # Temporary Remote Database
 ```bash
-mysql -h sql12.freemysqlhosting.net -u sql12369606 -pPU3MyFCCf7 -D sql12369606 | (2020-10-08)
+| (2020-10-08)
+mysql -h sql12.freemysqlhosting.net -u sql12369606 -pPU3MyFCCf7 -D sql12369606
 mysql -h db4free.net -u thilinatlm2 -pTLM98@mysql -D cms_dev_oosd
 mysql -u tlm -p12345 -D cms
 source ./src/database/migration/schema.sql
