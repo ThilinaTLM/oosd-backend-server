@@ -6,7 +6,7 @@ export const COMPLAINT_STATES = {
     IN_PRG: "In Progress",
     AWAIT_DIV_REV: "Awaiting Div Sec Review",
     DIV_REV_ACC: "Div Sec Reviewed",
-    AWAIT_DIS_REV: "Awaiting Dis Sec Reviewed",
+    AWAIT_DIS_REV: "Awaiting Dis Sec Review",
     DIS_REV_ACC: "Dis Sec Reviewed",
     SOLVED: "Solved",
     REJECTED: "Rejected"

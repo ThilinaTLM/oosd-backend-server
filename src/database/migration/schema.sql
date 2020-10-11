@@ -5,9 +5,12 @@ DROP PROCEDURE IF EXISTS AddComplaint;
 DROP PROCEDURE IF EXISTS AssignDivision;
 DROP PROCEDURE IF EXISTS UpdateDivision;
 DROP PROCEDURE IF EXISTS UpdateComplaint;
+DROP PROCEDURE IF EXISTS UpdateComplaintStatus;
+DROP PROCEDURE IF EXISTS UpdateComplaintLog;
 
 DROP FUNCTION IF EXISTS GenerateReferenceNo;
 
+DROP VIEW IF EXISTS complaint_full_details;
 DROP VIEW IF EXISTS accounts;
 DROP VIEW IF EXISTS complaints_with_divisions;
 
@@ -316,6 +319,25 @@ CREATE VIEW complaints_with_divisions AS
     FROM complaints c
     LEFT JOIN complaint_assignment ca ON ca.complaint_id = c.complaint_id;
 
+CREATE VIEW complaint_full_details AS
+    SELECT
+    	c.*,
+    	ca.assigned_div,
+    	ca.assigned_date,
+    	GROUP_CONCAT(JSON_OBJECT(
+    		'subject', cl.subject,
+    		'description', cl.description,
+    		'update_by', cl.update_by,
+    		'update_by_name', GetUserFullName(cl.update_by),
+    		'update_at', cl.update_at
+    		)) AS logs
+    FROM complaints c
+    LEFT JOIN complaint_assignment ca ON ca.complaint_id = c.complaint_id
+    LEFT JOIN complaint_log cl ON c.complaint_id = cl.complaint_id
+    GROUP BY cl.complaint_id;
+
+
+
 -- ---------------------------------------------------------------------------------------------------------------------
 --                         ____  __  __  _  _  ___  ____  ____  _____  _  _  ___
 --                        ( ___)(  )(  )( \( )/ __)(_  _)(_  _)(  _  )( \( )/ __)
@@ -346,6 +368,21 @@ BEGIN
     END IF;
 
     RETURN CONCAT(preText, '/', this_year, '/', this_month, '/', pointer );
+END //
+
+DELIMITER ;
+
+DELIMITER //
+
+CREATE FUNCTION GetUserFullName (
+    user_id VARCHAR(36)
+)
+RETURNS VARCHAR(100)
+BEGIN
+    DECLARE first_name VARCHAR(50);
+    DECLARE last_name VARCHAR(50);
+    SELECT first_name, last_name INTO first_name, last_name FROM users WHERE user_id = user_id;
+    RETURN CONCAT(first_name, ' ', last_name);
 END //
 
 DELIMITER ;
@@ -397,13 +434,20 @@ CREATE PROCEDURE AddComplaint (
     IN assigned_div VARCHAR(100) -- none or Division
 )
 BEGIN
+    DECLARE initial_status VARCHAR(50);
 
     IF ref_no = 'auto' THEN
        SELECT GenerateReferenceNo(type) INTO ref_no;
     END IF;
 
+    IF type = 'Direct to Division' THEN
+        SET initial_status = 'Awaiting Accept';
+    ELSE
+        SET initial_status = 'Draft'
+    END IF;
+
     INSERT INTO complaints
-        VALUES (complaint_id, ref_no, type, customer_id, subject, description, 'Draft', CURRENT_TIMESTAMP());
+        VALUES (complaint_id, ref_no, type, customer_id, subject, description, initial_status, CURRENT_TIMESTAMP());
 
     IF EXISTS(SELECT * FROM divisional_offices WHERE name = assigned_div) THEN
         INSERT INTO complaint_assignment VALUES (complaint_id, assigned_div, CURRENT_TIMESTAMP());
@@ -455,22 +499,18 @@ END //
 
 DELIMITER ;
 
--- Update Complaint Status ---------------------------------------------------------------------------------------------
+-- Log Complaint ---------------------------------------------------------------------------------------------
 
 DELIMITER //
 
-CREATE PROCEDURE UpdateComplaint (
+CREATE PROCEDURE UpdateComplaintLog (
     IN complaint_id VARCHAR(36),
     IN user_id VARCHAR(36),
 
-    IN status VARCHAR(50),
     IN subject VARCHAR(255),
     IN description TEXT
 )
 BEGIN
---    DECLARE previous_state VARCHAR(50);
---    SELECT status INTO previous_state FROM complaints WHERE complaint_id = complaint_id;
-
     INSERT INTO complaint_log (complaint_id, update_by, update_at, subject, description)
     VALUES (
         complaint_id,
@@ -480,11 +520,32 @@ BEGIN
         description
     );
 
---    IF (previous_state != status) AND EXISTS(SELECT * FROM complaint_states WHERE state = status) THEN
-    IF EXISTS(SELECT * FROM complaint_states WHERE state = status) THEN
-        UPDATE complaints SET status = status WHERE complaint_id = complaint_id;
-    END IF;
 END //
 
 DELIMITER ;
 
+-- Update Complaint Status ---------------------------------------------------------------------------------------------
+
+DELIMITER //
+
+CREATE PROCEDURE UpdateComplaintStatus (
+    IN complaint_id VARCHAR(36),
+    IN user_id VARCHAR(36),
+
+    IN status VARCHAR(50),
+    IN subject VARCHAR(255),
+    IN description TEXT
+)
+BEGIN
+    DECLARE current_status VARCHAR(50);
+    SELECT status INTO current_status FROM complaints WHERE complaint_id = complaint_id;
+
+    IF current_status != status THEN
+        CALL UpdateComplaintLog(complaint_id, user_id, subject, description);
+        UPDATE complaints SET status = status WHERE complaint_id = complaint_id;
+    ELSE
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Status is already set';
+    END IF;
+END //
+
+DELIMITER ;

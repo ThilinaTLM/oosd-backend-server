@@ -14,7 +14,7 @@ INSERT INTO complaint_states VALUES ('Awaiting Accept', '');
 INSERT INTO complaint_states VALUES ('In Progress', '');
 INSERT INTO complaint_states VALUES ('Awaiting Div Sec Review', '');
 INSERT INTO complaint_states VALUES ('Div Sec Reviewed', '');
-INSERT INTO complaint_states VALUES ('Awaiting Dis Sec Reviewed', '');
+INSERT INTO complaint_states VALUES ('Awaiting Dis Sec Review', '');
 INSERT INTO complaint_states VALUES ('Dis Sec Reviewed', '');
 INSERT INTO complaint_states VALUES ('Solved', '');
 INSERT INTO complaint_states VALUES ('Rejected', '');

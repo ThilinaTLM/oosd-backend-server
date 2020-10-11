@@ -136,18 +136,42 @@ export const complaint = {
         return [error, data[0]];
     },
 
-    updateComplaintStatus: async (complaintId: string, userId: string, data: any): Promise<ModelError> => {
+    getComplaintFullDetails: async (complaintId: string): Promise<[ModelError, string[]]> => {
+        const [error, data] = await mysqlExeEW.run(
+            ...QBuild.SELECT('complaint_full_details', {complaint_id: complaintId})
+        );
+
+        return [error, data[0]];
+    },
+
+    updateComplaintLog: async (complaintId: string, userId: string, data: any): Promise<ModelError> => {
 
         const args = [
             complaintId,
             userId,
-            data.status || 'none',
             data.subject,
             data.description
         ];
 
         const [error] = await mysqlExeEW.run(
-            `CALL UpdateComplaint(${QBuild.ARGS_STRING(args.length)})`,
+            `CALL UpdateComplaintLog(${QBuild.ARGS_STRING(args.length)})`,
+            args
+        );
+        return error;
+    },
+
+    updateComplaintStatus: async (complaintId: string, userId: string, data: any): Promise<ModelError> => {
+
+        const args = [
+            complaintId,
+            userId,
+            data.status,
+            data.subject,
+            data.description
+        ];
+
+        const [error] = await mysqlExeEW.run(
+            `CALL UpdateComplaintStatus(${QBuild.ARGS_STRING(args.length)})`,
             args
         );
         return error;

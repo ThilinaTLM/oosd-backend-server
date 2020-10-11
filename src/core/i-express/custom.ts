@@ -7,6 +7,7 @@ import { UserData } from "../../database/models/user";
 import { RBuilder } from "../";
 
 export interface Request extends ExpRequest {
+    modelName: string;
     user: UserData
 }
 

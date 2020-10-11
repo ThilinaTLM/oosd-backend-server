@@ -1,7 +1,5 @@
 import { Handler } from "../../core";
-import { build } from "../core/users";
 import { MErr, model } from "../../database";
-
 
 export const addDivision: Handler = async (req, res) => {
     const { r } = res;
@@ -36,7 +34,7 @@ export const addGNOffice: Handler = async (req, res) => {
 
     if (error === MErr.DUPLICATE) {
         r.status.BAD_REQ()
-            .message("Division already exists")
+            .message("Grama Niladhari Division already exists")
             .send();
         return;
     }
@@ -53,10 +51,11 @@ export const addGNOffice: Handler = async (req, res) => {
         .send();
 };
 
-export const getAllDivisions: Handler = async (req, res) => {
+export const getAllManual: Handler = async (req, res) => {
     const { r } = res;
 
-    const [error, data] = await model.utils.getAllDivisions();
+    // @ts-ignore
+    const [error, data] = await model.utils[req.modelName]();
 
     if (error === MErr.NO_ERRORS) {
         r.status.OK()
@@ -71,15 +70,40 @@ export const getAllDivisions: Handler = async (req, res) => {
         .send();
 };
 
-export const getAllGNOffices: Handler = async (req, res) => {
-    const { r } = res;
+export const getAllDivisions: Handler = async (req, res, next) => {
+    req.modelName = "getAllDivisions"
+    getAllManual(req, res, next)
+};
 
-    const [error, data] = await model.utils.getAllGNOffices();
+export const getAllGNOffices: Handler = async (req, res, next) => {
+    req.modelName = "getAllGNOffices"
+    getAllManual(req, res, next)
+};
+
+export const getAllComplaintStates: Handler = async (req, res, next) => {
+    req.modelName = "getAllComplaintStatus"
+    getAllManual(req, res, next)
+};
+
+export const getAllComplaintTypes: Handler = async (req, res, next) => {
+    req.modelName = "getAllComplaintTypes"
+    getAllManual(req, res, next)
+};
+
+export const getAllUserRoles: Handler = async (req, res, next) => {
+    req.modelName = "getAllUserRoles"
+    getAllManual(req, res, next)
+};
+
+export const deleteDivision: Handler = async (req, res) => {
+    const { r } = res;
+    const { name } = req.params;
+
+    const error = await model.utils.deleteDivision(name);
 
     if (error === MErr.NO_ERRORS) {
         r.status.OK()
-            .data(data)
-            .message("Success")
+            .message("Successfully deleted")
             .send();
         return;
     }
@@ -88,3 +112,22 @@ export const getAllGNOffices: Handler = async (req, res) => {
         .message("Internal server error")
         .send();
 };
+
+export const deleteGNOffice: Handler = async (req, res) => {
+    const { r } = res;
+    const { name } = req.params;
+
+    const error = await model.utils.deleteGNOffice(name);
+
+    if (error === MErr.NO_ERRORS) {
+        r.status.OK()
+            .message("Successfully deleted")
+            .send();
+        return;
+    }
+
+    r.status.ERROR()
+        .message("Internal server error")
+        .send();
+};
+

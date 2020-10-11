@@ -87,7 +87,6 @@ export const addAttachment: Handler = async (req, res) => {
     r.send_ISE();
 };
 
-
 export const getComplaint: Handler = async (req, res) => {
     const { r } = res;
     const condition = req.query;
@@ -139,31 +138,6 @@ export const getComplaintLog: Handler = async (req, res) => {
     r.send_ISE();
 };
 
-
-export const updateComplaintStatus: Handler = async (req, res) => {
-    const { r } = res;
-    const userId = req.user.userId;
-    const { complaintId } = req.params;
-    const { status, subject, description } = req.body;
-
-    const error = await model.complaint.updateComplaintStatus(
-        complaintId,
-        userId,
-        {
-            status, subject, description
-        }
-    );
-
-    if (error == MErr.NO_ERRORS) {
-        r.status.OK()
-            .message("Success")
-            .send();
-        return;
-    }
-
-    r.send_ISE();
-};
-
 export const getComplaintCount: Handler = async (req, res) => {
     const {r} = res;
     const query = req.query
@@ -180,3 +154,20 @@ export const getComplaintCount: Handler = async (req, res) => {
 
     r.send_ISE();
 }
+
+export const getComplaintComplete: Handler = async (req, res) => {
+    const { r } = res;
+    const {complaintId} = req.params;
+
+    const [error, complaints] = await model.complaint.getComplaintFullDetails(complaintId);
+
+    if (error == MErr.NO_ERRORS) {
+        r.status.OK()
+            .message("Success")
+            .data(complaints)
+            .send();
+        return;
+    }
+
+    r.send_ISE();
+};
