@@ -41,7 +41,7 @@ comRouter.get('/get-full-details/:complaintId', complaint.getComplaintComplete)
  *      subject*
  *      description*
  */
-comRouter.post('/write-log/:complaintId', complaint.writeLogEntry)
+comRouter.post('/write-log/:complaintId', preBuilt.ALL_ROLES, complaint.writeLogEntry)
 
 /**
  * Type : PUT

@@ -3,6 +3,7 @@ import { v4 as genUUID } from "uuid";
 import { mysqlExeEW } from "../core/eWrapper/mysql";
 import { QBuild } from "../core/qBuilder";
 import { MErr, ModelError } from "../index";
+import { ComTypes } from "../../core";
 
 interface ComplaintData {
     complaintId: string
@@ -141,7 +142,14 @@ export const complaint = {
             ...QBuild.SELECT('complaint_full_details', {complaint_id: complaintId})
         );
 
-        return [error, data[0]];
+        let complaint = null
+        if (error === "" && data[0].length > 0) {
+            complaint = data[0][0]
+            complaint.logs = JSON.parse( complaint.logs || "[]" )
+            complaint.attachments = JSON.parse( complaint.attachments || "[]")
+        }
+
+        return [error, complaint];
     },
 
     updateComplaintLog: async (complaintId: string, userId: string, data: any): Promise<ModelError> => {

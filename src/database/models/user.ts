@@ -74,9 +74,9 @@ export const user = {
     },
 
     getUser: async (condition: any): Promise<[ModelError, UserData[]]> => {
-        condition = mapper.backward(condition)
+        condition = mapper.backward(condition);
 
-        const [error, results] = await mysqlExeEW.run(...QBuild.SELECT_USER(condition))
+        const [error, results] = await mysqlExeEW.run(...QBuild.SELECT_USER(condition));
 
         let users;
         if (error === "") { // if error
@@ -92,7 +92,7 @@ export const user = {
 
     updateUserDetails: async (userId: string, data: any): Promise<ModelError> => {
         // remove unique fields
-        delete data.userId
+        delete data.userId;
 
         data = mapper.backward(data);
 
@@ -101,17 +101,14 @@ export const user = {
     },
 
     updateCredentials: async (userId: string, data: any): Promise<ModelError> => {
-        delete data.user_id;
 
-        data = mapper.backward(data);
-
-        const [error, _] = await mysqlExeEW.run(...QBuild.UPDATE("credentials", data, { user_id: userId }));
+        const [error, _] = await mysqlExeEW.run(...QBuild.UPDATE("credentials", data , { user_id: userId }));
         return error;
     },
 
     checkUsername: async (username: string): Promise<[ModelError, boolean]> => {
 
-        const [error, data] = await mysqlExeEW.run(...QBuild.SELECT('credentials', {username}))
+        const [error, data] = await mysqlExeEW.run(...QBuild.SELECT("credentials", { username }));
 
         if (error !== "") { // if any error happens
             return [error, true];

@@ -1,5 +1,9 @@
 
 -- Clean Database -------------------------------------------------------------------------------------------
+DROP VIEW IF EXISTS complaint_full_details;
+DROP VIEW IF EXISTS accounts;
+DROP VIEW IF EXISTS complaints_with_divisions;
+
 DROP PROCEDURE IF EXISTS AddAccount;
 DROP PROCEDURE IF EXISTS AddComplaint;
 DROP PROCEDURE IF EXISTS AssignDivision;
@@ -8,11 +12,8 @@ DROP PROCEDURE IF EXISTS UpdateComplaint;
 DROP PROCEDURE IF EXISTS UpdateComplaintStatus;
 DROP PROCEDURE IF EXISTS UpdateComplaintLog;
 
+DROP FUNCTION IF EXISTS GetUserFullName;
 DROP FUNCTION IF EXISTS GenerateReferenceNo;
-
-DROP VIEW IF EXISTS complaint_full_details;
-DROP VIEW IF EXISTS accounts;
-DROP VIEW IF EXISTS complaints_with_divisions;
 
 DROP TABLE IF EXISTS notifications;
 DROP TABLE IF EXISTS complaint_attachment;
@@ -303,42 +304,6 @@ CREATE TABLE notifications (
 CREATE INDEX fk_notification_user_idx ON notifications (user_id ASC);
 
 -- ---------------------------------------------------------------------------------------------------------------------
---                                     _  _  ____  ____  _    _  ___
---                                    ( \/ )(_  _)( ___)( \/\/ )/ __)
---                                     \  /  _)(_  )__)  )    ( \__ \
---                                      \/  (____)(____)(__/\__)(___/
--- ---------------------------------------------------------------------------------------------------------------------
-
-CREATE VIEW accounts AS
-    SELECT  u.*, c.username, c.hash, c.verified
-    FROM users u
-    LEFT JOIN credentials c ON c.user_id = u.user_id;
-
-CREATE VIEW complaints_with_divisions AS
-    SELECT c.*, ca.assigned_div, ca.assigned_date
-    FROM complaints c
-    LEFT JOIN complaint_assignment ca ON ca.complaint_id = c.complaint_id;
-
-CREATE VIEW complaint_full_details AS
-    SELECT
-    	c.*,
-    	ca.assigned_div,
-    	ca.assigned_date,
-    	GROUP_CONCAT(JSON_OBJECT(
-    		'subject', cl.subject,
-    		'description', cl.description,
-    		'update_by', cl.update_by,
-    		'update_by_name', GetUserFullName(cl.update_by),
-    		'update_at', cl.update_at
-    		)) AS logs
-    FROM complaints c
-    LEFT JOIN complaint_assignment ca ON ca.complaint_id = c.complaint_id
-    LEFT JOIN complaint_log cl ON c.complaint_id = cl.complaint_id
-    GROUP BY cl.complaint_id;
-
-
-
--- ---------------------------------------------------------------------------------------------------------------------
 --                         ____  __  __  _  _  ___  ____  ____  _____  _  _  ___
 --                        ( ___)(  )(  )( \( )/ __)(_  _)(_  _)(  _  )( \( )/ __)
 --                         )__)  )(__)(  )  (( (__   )(   _)(_  )(_)(  )  ( \__ \
@@ -370,19 +335,14 @@ BEGIN
     RETURN CONCAT(preText, '/', this_year, '/', this_month, '/', pointer );
 END //
 
-DELIMITER ;
-
-DELIMITER //
-
 CREATE FUNCTION GetUserFullName (
     user_id VARCHAR(36)
 )
 RETURNS VARCHAR(100)
 BEGIN
-    DECLARE first_name VARCHAR(50);
-    DECLARE last_name VARCHAR(50);
-    SELECT first_name, last_name INTO first_name, last_name FROM users WHERE user_id = user_id;
-    RETURN CONCAT(first_name, ' ', last_name);
+	DECLARE full_name VARCHAR(100);
+	SELECT CONCAT(first_name, ' ', last_name) INTO full_name FROM users u WHERE u.user_id = user_id LIMIT 1;
+    RETURN full_name;
 END //
 
 DELIMITER ;
@@ -443,7 +403,7 @@ BEGIN
     IF type = 'Direct to Division' THEN
         SET initial_status = 'Awaiting Accept';
     ELSE
-        SET initial_status = 'Draft'
+        SET initial_status = 'Draft';
     END IF;
 
     INSERT INTO complaints
@@ -537,15 +497,58 @@ CREATE PROCEDURE UpdateComplaintStatus (
     IN description TEXT
 )
 BEGIN
-    DECLARE current_status VARCHAR(50);
-    SELECT status INTO current_status FROM complaints WHERE complaint_id = complaint_id;
-
-    IF current_status != status THEN
-        CALL UpdateComplaintLog(complaint_id, user_id, subject, description);
-        UPDATE complaints SET status = status WHERE complaint_id = complaint_id;
-    ELSE
+    IF EXISTS(SELECT * FROM complaints c WHERE c.complaint_id = complaint_id AND c.status = status LIMIT 1) THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Status is already set';
+    ELSE
+    	CALL UpdateComplaintLog(complaint_id, user_id, subject, description);
+        UPDATE complaints c SET status = status WHERE c.complaint_id = complaint_id;
     END IF;
 END //
 
 DELIMITER ;
+
+
+-- ---------------------------------------------------------------------------------------------------------------------
+--                                     _  _  ____  ____  _    _  ___
+--                                    ( \/ )(_  _)( ___)( \/\/ )/ __)
+--                                     \  /  _)(_  )__)  )    ( \__ \
+--                                      \/  (____)(____)(__/\__)(___/
+-- ---------------------------------------------------------------------------------------------------------------------
+
+CREATE VIEW accounts AS
+    SELECT  u.*, c.username, c.hash, c.verified
+    FROM users u
+    LEFT JOIN credentials c ON c.user_id = u.user_id;
+
+CREATE VIEW complaints_with_divisions AS
+    SELECT c.*, ca.assigned_div, ca.assigned_date
+    FROM complaints c
+    LEFT JOIN complaint_assignment ca ON ca.complaint_id = c.complaint_id;
+
+CREATE VIEW complaint_full_details AS
+    SELECT
+    	c.*,
+    	ca.assigned_div,
+    	ca.assigned_date,
+    	log_data.logs,
+    	att_data.attachments
+    FROM complaints c
+    LEFT JOIN complaint_assignment ca ON ca.complaint_id = c.complaint_id
+    LEFT JOIN (
+    	SELECT
+    		complaint_id,
+    		CONCAT( '[', GROUP_CONCAT(DISTINCT JSON_OBJECT(
+        		'subject', cl.subject,
+        		'description', cl.description,
+        		'update_by', cl.update_by,
+        		'update_by_name', GetUserFullName(cl.update_by),
+        		'update_at', cl.update_at
+        	)), ']') AS logs
+        	FROM complaint_log cl GROUP BY cl.complaint_id
+    ) log_data ON log_data.complaint_id = c.complaint_id
+    LEFT JOIN (
+    	SELECT
+    		complaint_id,
+    		CONCAT( '[', GROUP_CONCAT( CONCAT('"', ca.attachment_id, '"')), ']') AS attachments
+        	FROM complaint_attachment ca GROUP BY ca.complaint_id
+    ) att_data ON att_data.complaint_id = c.complaint_id;

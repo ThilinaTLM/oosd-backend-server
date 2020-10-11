@@ -97,7 +97,7 @@ export const getAllUserRoles: Handler = async (req, res, next) => {
 
 export const deleteDivision: Handler = async (req, res) => {
     const { r } = res;
-    const { name } = req.params;
+    const { name } = req.body;
 
     const error = await model.utils.deleteDivision(name);
 
@@ -115,7 +115,7 @@ export const deleteDivision: Handler = async (req, res) => {
 
 export const deleteGNOffice: Handler = async (req, res) => {
     const { r } = res;
-    const { name } = req.params;
+    const { name } = req.body;
 
     const error = await model.utils.deleteGNOffice(name);
 

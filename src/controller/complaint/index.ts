@@ -1,9 +1,16 @@
-import { Handler } from "../../core";
+import { ComTypes, Handler } from "../../core";
 import { MErr, model } from "../../database";
 
 export const addComplaint: Handler = async (req, res) => {
     const { r } = res;
     const data = req.body;
+
+    if (data.type === ComTypes.DIRECT_TO_DIV && !data.assignedDiv) {
+        r.status.BAD_REQ()
+            .message("Please specify division")
+            .send()
+        return;
+    }
 
     const [error, complaintId] = await model.complaint.addComplaint(data);
 
@@ -84,6 +91,13 @@ export const addAttachment: Handler = async (req, res) => {
         return;
     }
 
+    if (error === MErr.DUPLICATE) {
+        r.status.BAD_REQ()
+            .message("Attachment is already added")
+            .send()
+        return;
+    }
+
     r.send_ISE();
 };
 
@@ -91,12 +105,12 @@ export const getComplaint: Handler = async (req, res) => {
     const { r } = res;
     const condition = req.query;
 
-    const [error, complaints] = await model.complaint.getComplaint(condition);
+    const [error, complaint] = await model.complaint.getComplaint(condition);
 
     if (error == MErr.NO_ERRORS) {
         r.status.OK()
             .message("Success")
-            .data(complaints)
+            .data(complaint)
             .send();
         return;
     }
