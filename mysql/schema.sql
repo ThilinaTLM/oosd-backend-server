@@ -1,3 +1,6 @@
+-- Clean DB -------------------------------------------------------------------------------------------
+CREATE DATABASE IF NOT EXISTS cms;
+USE cms;
 
 -- Clean Database -------------------------------------------------------------------------------------------
 DROP VIEW IF EXISTS complaint_full_details;
@@ -565,3 +568,7 @@ CREATE VIEW complaint_full_details AS
     	GetAttachmentsAsArray(c.complaint_id) AS attachments
     FROM complaints c
     LEFT JOIN complaint_assignment ca ON ca.complaint_id = c.complaint_id;
+
+-- ---------------------------------------------------------------------------------------------------------------------
+
+--SOURCE ./insert.sql
