@@ -4,7 +4,6 @@ Backend API of Public complaint Management System at Galle District Secretariat 
 
 # Temporary Remote Database
 ```bash
-| (2020-10-08)
 mysql -h sql12.freemysqlhosting.net -u sql12369606 -pPU3MyFCCf7 -D sql12369606
 mysql -h ec2-54-237-84-93.compute-1.amazonaws.com --port 3307 -u root -proot -D cms
 mysql -u tlm -p12345 -D cms
