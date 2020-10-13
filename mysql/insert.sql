@@ -1,3 +1,4 @@
+USE cms;
 
 -- User Roles
 INSERT INTO user_roles VALUES ('Administrator', '');
