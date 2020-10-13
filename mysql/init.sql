@@ -1,2 +1,2 @@
-SOURCE /schema/schema.sql
-SOURCE /schema/insert.sql
+SOURCE /schema/schema.sql;
+SOURCE /schema/insert.sql;
