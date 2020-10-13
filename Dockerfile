@@ -1,7 +1,8 @@
 FROM node
 WORKDIR /app
 
-#ENV MYSQL_HOST=sql12.freemysqlhosting.net
+ENV MYSQL_HOST=ec2-54-237-84-93.compute-1.amazonaws.com
+ENV MYSQL_PORT=3307
 ENV MYSQL_USER=root
 ENV MYSQL_USER_PASSWORD=root
 ENV MYSQL_DATABASE=cms

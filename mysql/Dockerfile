@@ -1,9 +1,11 @@
 FROM mysql
 
-ENV MYSQL_DATABASE cms
+WORKDIR /schema
+
 ENV MYSQL_ROOT_PASSWORD 12345
+ENV MYSQL_DATABASE cms
 
-COPY ./schema.sql /docker-entrypoint-initdb.d/
-#COPY ./insert.sql /docker-entrypoint-initdb.d/
+COPY ./schema.sql .
+COPY ./insert.sql .
 
-EXPOSE 3306
+EXPOSE 3307:3306
