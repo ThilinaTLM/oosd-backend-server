@@ -1,6 +1,6 @@
 -- Clean DB -------------------------------------------------------------------------------------------
-CREATE DATABASE IF NOT EXISTS cms;
 USE cms;
+SET GLOBAL log_bin_trust_function_creators = 1;
 
 -- Clean Database -------------------------------------------------------------------------------------------
 DROP VIEW IF EXISTS complaint_full_details;
