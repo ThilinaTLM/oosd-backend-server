@@ -5,8 +5,10 @@ test
 
 # environment files
 .env
+.env-remote
 .vscode
 .idea
+ecosystem.config.js
 
 # pkg manager files
 yarn.lock
