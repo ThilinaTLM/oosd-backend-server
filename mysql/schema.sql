@@ -571,5 +571,3 @@ CREATE VIEW complaint_full_details AS
     LEFT JOIN complaint_assignment ca ON ca.complaint_id = c.complaint_id;
 
 -- ---------------------------------------------------------------------------------------------------------------------
-
---SOURCE ./insert.sql
