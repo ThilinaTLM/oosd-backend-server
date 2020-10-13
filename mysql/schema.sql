@@ -1,7 +1,6 @@
 -- Clean DB -------------------------------------------------------------------------------------------
-GRANT ALL PRIVILEGES ON *.* TO root@'%';
-USE cms;
 SET GLOBAL log_bin_trust_function_creators = 1;
+USE cms;
 
 -- Clean Database -------------------------------------------------------------------------------------------
 DROP VIEW IF EXISTS complaint_full_details;
