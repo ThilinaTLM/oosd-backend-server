@@ -14,6 +14,13 @@ fileRouter.use(RBuilder);
  */
 fileRouter.get('/attachment/:attachmentId',  preBuilt.ALL_ROLES, file.getAttachment);
 
+
+/**
+ * Get Attachment Details
+ */
+fileRouter.get('/attachment/details/:attachmentId',  preBuilt.ALL_ROLES, file.getAttachmentDetails);
+
+
 /**
  * Single file upload
  */

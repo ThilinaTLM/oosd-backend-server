@@ -29,6 +29,30 @@ export const getAttachment: Handler = async (req, res) => {
     r.send_ISE();
 };
 
+export const getAttachmentDetails: Handler = async (req, res) => {
+    const { r } = res;
+    const { attachmentId } = req.params;
+    const [error, attachment] = await model.utils.getAttachment(attachmentId);
+
+    if (error === MErr.NO_ERRORS) {
+        r.status.OK()
+            .data(attachment)
+            .message("Success")
+            .send()
+        return;
+    }
+
+    if (error === MErr.NO_ENTRY_FOUND) {
+        r.status.NOT_FOUND()
+            .message(`Couldn't find the attachment`)
+            .send();
+        return;
+    }
+
+    r.send_ISE();
+};
+
+
 export const uploadAttachment: Handler = async (req, res) => {
     const { r } = res;
     const { file } = req;

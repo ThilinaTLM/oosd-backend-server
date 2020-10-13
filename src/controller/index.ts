@@ -51,7 +51,7 @@ import {
     updateStatusManual
 } from "./complaint/update";
 
-import { getAttachment, uploadAttachment } from "./file";
+import { getAttachment, uploadAttachment, getAttachmentDetails } from "./file";
 
 /**
  * User Account Controllers
@@ -130,5 +130,6 @@ export const util = {
  */
 export const file = {
     getAttachment: getAttachment as Handler,
+    getAttachmentDetails: getAttachmentDetails as Handler,
     addAttachment: uploadAttachment as Handler
 };
