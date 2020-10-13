@@ -6,10 +6,10 @@ Backend API of Public complaint Management System at Galle District Secretariat 
 ```bash
 | (2020-10-08)
 mysql -h sql12.freemysqlhosting.net -u sql12369606 -pPU3MyFCCf7 -D sql12369606
-mysql -h db4free.net -u thilinatlm2 -pTLM98@mysql -D cms_dev_oosd
+mysql -h ec2-54-237-84-93.compute-1.amazonaws.com --port 3307 -u root -proot -D cms
 mysql -u tlm -p12345 -D cms
-source ./src/database/migration/schema.sql
-source ./src/database/migration/insert.sql
+source ./mysql/migration/schema.sql
+source ./mysql/migration/insert.sql
 ```
 
 ---
