@@ -1,4 +1,5 @@
 -- Clean DB -------------------------------------------------------------------------------------------
+GRANT ALL PRIVILEGES ON *.* TO root@'%';
 USE cms;
 SET GLOBAL log_bin_trust_function_creators = 1;
 
