@@ -564,7 +564,7 @@ CREATE VIEW complaint_full_details AS
     	c.*,
     	ca.assigned_div,
     	ca.assigned_date,
-    	GetLogsAsArray(c.complaint_id) AS logs,
+    	GetLogsAsArray(c.complaint_id) AS activity_log,
     	GetAttachmentsAsArray(c.complaint_id) AS attachments
     FROM complaints c
     LEFT JOIN complaint_assignment ca ON ca.complaint_id = c.complaint_id;

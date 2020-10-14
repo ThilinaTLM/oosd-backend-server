@@ -3,7 +3,6 @@ import { v4 as genUUID } from "uuid";
 import { mysqlExeEW } from "../core/eWrapper/mysql";
 import { QBuild } from "../core/qBuilder";
 import { MErr, ModelError } from "../index";
-import { ComTypes } from "../../core";
 
 interface ComplaintData {
     complaintId: string
@@ -39,6 +38,7 @@ const complaintMapper = BuildMapper<ComplaintData>([
 const logEntryMapper = BuildMapper<ComplaintLogEntry>([
     mp("complaint_id", "complaintId"),
     mp("update_by", "updateBy"),
+    mp("update_by_name", "updaterName"),
     mp("update_at", "updateAt"),
 ]);
 
@@ -137,16 +137,26 @@ export const complaint = {
         return [error, data[0]];
     },
 
-    getComplaintFullDetails: async (complaintId: string): Promise<[ModelError, string[]]> => {
+    getComplaintFullDetails: async (complaintId: string): Promise<[ModelError, any]> => {
         const [error, data] = await mysqlExeEW.run(
             ...QBuild.SELECT('complaint_full_details', {complaint_id: complaintId})
         );
 
-        let complaint = null
+        let complaint: any = null
         if (error === "" && data[0].length > 0) {
-            complaint = data[0][0]
-            complaint.logs = JSON.parse( complaint.logs || "[]" )
-            complaint.attachments = JSON.parse( complaint.attachments || "[]")
+            const rawActivityLog = JSON.parse( data[0][0].activity_log || "[]" )
+            delete data[0][0].activity_log
+
+            const rawAttachments = JSON.parse( data[0][0].attachments || "[]")
+            delete data[0][0].attachment
+
+            complaint =  complaintMapper.forward(data[0][0])
+            complaint.activityLog = rawActivityLog
+            for (let i = 0; i < complaint.activityLog.length; i++) {
+                complaint.activityLog[i] = logEntryMapper.forward(complaint.activityLog[i])
+            }
+
+            complaint.attachments  = rawAttachments
         }
 
         return [error, complaint];
