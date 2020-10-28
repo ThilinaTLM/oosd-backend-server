@@ -1,7 +1,7 @@
 FROM node
 WORKDIR /app
 
-ENV MYSQL_HOST=localhost
+ENV MYSQL_HOST=ec2-100-25-45-111.compute-1.amazonaws.com
 ENV MYSQL_PORT=3306
 ENV MYSQL_USER=root
 ENV MYSQL_USER_PASSWORD=root
