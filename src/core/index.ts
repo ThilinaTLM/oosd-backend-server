@@ -6,6 +6,9 @@ import { USER_ROLES } from "./dicts/user-roles";
 import { COMPLAINT_TYPES } from "./dicts/com-types";
 import { COMPLAINT_STATES } from "./dicts/com-states";
 
+import { EmailSender } from "./notifier/sender";
+import { notifyComplainerAccept, notifyComplainerRejected, notifyComplainerResolved } from "./notifier/message"
+
 /**
  * Custom Types for Express Framework
  */
@@ -32,3 +35,13 @@ jwtMan.startCleaningJob();
  */
 export const RBuilder = ResponseBuilder;
 
+/**
+ * Email Sender
+ */
+export const emailSender = new EmailSender('gallecms@gmail.com', "CMS@galle123");
+
+export class EmailBuilder {
+    static complaintAccept = notifyComplainerAccept
+    static complaintReject = notifyComplainerRejected
+    static complaintResolved = notifyComplainerResolved
+}

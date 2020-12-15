@@ -162,6 +162,19 @@ export const complaint = {
         return [error, complaint];
     },
 
+    getCustomerEmail: async (complaintId: string): Promise<[ModelError, any]> => {
+        const [error, data] = await mysqlExeEW.run(
+            `SELECT cu.email FROM complaints co
+                        JOIN customers cu ON cu.customer_id = co.customer_id
+                            WHERE co.complaint_id = ${complaintId}`,
+            [complaintId])
+        if (data.length > 0) {
+            return [error, data[0] || null];
+        } else {
+            return [MErr.NO_ENTRY_FOUND, null];
+        }
+    },
+
     updateComplaintLog: async (complaintId: string, userId: string, data: any): Promise<ModelError> => {
 
         const args = [
