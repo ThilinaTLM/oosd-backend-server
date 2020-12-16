@@ -160,6 +160,7 @@ export const complaint = {
 
             complaint.attachments  = rawAttachments
         }
+        console.log("HERE3")
 
         return [error, complaint];
     },
