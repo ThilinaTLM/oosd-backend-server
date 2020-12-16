@@ -169,6 +169,7 @@ export const complaint = {
                                 WHERE complaint_id = '${complaintId}')`,
             [complaintId])
         if (data || data.length > 0) {
+            console.log('Email : ' + data)
             return [error, data[0] || null];
         } else {
             return [MErr.NO_ENTRY_FOUND, null];
