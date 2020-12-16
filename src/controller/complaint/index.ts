@@ -156,7 +156,7 @@ export const getComplaintCount: Handler = async (req, res) => {
     const {r} = res;
     const query = req.query
 
-    const [error, count] = await model.utils.getCount('complaints', query)
+    const [error, count] = await model.utils.getCount('complaints_with_divisions', query)
 
     if (error == MErr.NO_ERRORS) {
         r.status.OK()
