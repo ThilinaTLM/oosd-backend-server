@@ -168,7 +168,7 @@ export const complaint = {
                     WHERE customer_id = (SELECT customer_id FROM complaints 
                                 WHERE complaint_id = '${complaintId}')`,
             [complaintId])
-        if (data || data.length > 0) {
+        if (data || data.length > 0) { // none
             console.log('Email : ' + data)
             return [error, data[0] || null];
         } else {
