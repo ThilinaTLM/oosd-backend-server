@@ -168,7 +168,7 @@ export const complaint = {
                         JOIN customers cu ON cu.customer_id = co.customer_id
                             WHERE co.complaint_id = ${complaintId}`,
             [complaintId])
-        if (data.length > 0) {
+        if (data || data.length > 0) {
             return [error, data[0] || null];
         } else {
             return [MErr.NO_ENTRY_FOUND, null];
