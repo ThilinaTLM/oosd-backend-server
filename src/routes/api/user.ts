@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { user } from "../../controller/";
-import {preBuilt} from '../../middlewares'
+import { preBuilt } from '../../middlewares'
 
 export const userRouter = Router();
 
@@ -18,3 +18,5 @@ userRouter.put('/update-user/:userId', preBuilt.ALL_ROLES, user.updateData);
 userRouter.put('/update-credential/:userId', preBuilt.ALL_ROLES, user.updateCredential);
 userRouter.put('/verify-user/:userId', preBuilt.ONLY_ADMIN, user.verify);
 userRouter.put('/disable-user/:userId', preBuilt.ONLY_ADMIN, user.disable);
+
+userRouter.get('/get-count', preBuilt.ONLY_ADMIN, user.count); // query allowed

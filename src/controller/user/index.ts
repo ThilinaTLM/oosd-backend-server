@@ -114,3 +114,21 @@ export const disableUser: Handler = async (req, res) => {
 
     r.send_ISE();
 };
+
+export const getUserCount: Handler = async (req, res) => {
+    const {r} = res;
+
+    const [error, count] = await model.utils.getCount('accounts');
+
+    if (error === MErr.NO_ERRORS) {
+        r.status.OK()
+            .message('Success')
+            .data(count)
+            .send()
+        return
+    }
+
+    r.status.ERROR()
+        .message('Internal Server Error')
+        .send()
+}

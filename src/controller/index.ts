@@ -7,7 +7,8 @@ import {
     updateUserData,
     updateCredential,
     verifyUser,
-    disableUser
+    disableUser,
+    getUserCount
 } from "./user";
 import {
     addCustomer,
@@ -64,7 +65,8 @@ export const user = {
     updateData: updateUserData as Handler,
     updateCredential: updateCredential as Handler,
     verify: verifyUser as Handler,
-    disable: disableUser as Handler
+    disable: disableUser as Handler,
+    count: getUserCount as Handler
 };
 
 /**
