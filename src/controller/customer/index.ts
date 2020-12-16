@@ -69,7 +69,7 @@ export const getCustomer: Handler = async (req, res) => {
 export const getCustomerCount: Handler = async (req, res) => {
     const {r} = res;
 
-    const [error, count] = await model.utils.getCount('customers');
+    const [error, count] = await model.utils.getCount('customers', req.query);
 
     if (error === MErr.NO_ERRORS) {
         r.status.OK()

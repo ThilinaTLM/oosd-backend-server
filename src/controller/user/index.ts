@@ -118,7 +118,7 @@ export const disableUser: Handler = async (req, res) => {
 export const getUserCount: Handler = async (req, res) => {
     const {r} = res;
 
-    const [error, count] = await model.utils.getCount('accounts');
+    const [error, count] = await model.utils.getCount('accounts', req.query);
 
     if (error === MErr.NO_ERRORS) {
         r.status.OK()
