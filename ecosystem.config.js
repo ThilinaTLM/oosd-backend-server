@@ -1,7 +1,7 @@
 module.exports = {
     apps: [
         {
-            name: "oosd-backend-api",
+            name: "api",
             script: "./dist/main.js",
             watch: false,
             env_development: {
