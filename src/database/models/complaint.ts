@@ -167,6 +167,8 @@ export const complaint = {
             `SELECT email FROM customers 
                     WHERE customer_id = (SELECT customer_id FROM complaints 
                                 WHERE complaint_id = ?)`,
+                                [complaintId])
+                                
         if (data[0] || data[0].length > 0) {
             return [error, data[0][0].email];
         }
