@@ -166,14 +166,11 @@ export const complaint = {
         const [error, data] = await mysqlExeEW.run(
             `SELECT email FROM customers 
                     WHERE customer_id = (SELECT customer_id FROM complaints 
-                                WHERE complaint_id = '${complaintId}')`,
+                                WHERE complaint_id = ?)`,
             [complaintId])
-        if (data || data.length > 0) { // none
-            console.log('Email : ' + data)
-            return [error, data[0] || null];
-        } else {
-            return [MErr.NO_ENTRY_FOUND, null];
-        }
+        console.log(data)
+        return [MErr.NO_ENTRY_FOUND, null];
+        
     },
 
     updateComplaintLog: async (complaintId: string, userId: string, data: any): Promise<ModelError> => {
