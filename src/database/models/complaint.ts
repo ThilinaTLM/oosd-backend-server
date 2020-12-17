@@ -169,7 +169,7 @@ export const complaint = {
         const [error, data] = await mysqlExeEW.run(
             `SELECT email FROM customers 
                     WHERE customer_id = (SELECT customer_id FROM complaints 
-                                WHERE complaint_id = ?)`,
+                                WHERE complaint_id = ?)`, // ss
                                 [complaintId])
                                 
         if (data[0] || data[0].length > 0) {
