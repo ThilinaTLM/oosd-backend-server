@@ -139,6 +139,8 @@ export const complaint = {
 
     getComplaintFullDetails: async (complaintId: string): Promise<[ModelError, any]> => {
         console.log("HERE1")
+        const a = QBuild.SELECT('complaint_full_details', {complaint_id: complaintId})
+        console.log(a)
         const [error, data] = await mysqlExeEW.run(
             ...QBuild.SELECT('complaint_full_details', {complaint_id: complaintId})
         );
