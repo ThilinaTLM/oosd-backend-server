@@ -6,9 +6,12 @@ test
 # environment files
 .env
 .env-remote
-.vscode
 .idea
 
 # pkg manager files
 yarn.lock
 package-lock.json
+branch_structure.json
+temp_auto_push.bat
+temp_interactive_push.bat
+.gitignore
