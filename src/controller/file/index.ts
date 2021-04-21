@@ -8,6 +8,11 @@ const ATTACHMENTS_DIRECTORY = join(UPLOADS_DIRECTORY, "attachments");
 /**
  * Static File Server
  */
+
+/**
+ * localhost:8000/file/get/:attachmentId
+ * <a href="http://localhost:8000/file/get/:attachmentId">
+ */
 export const getAttachment: Handler = async (req, res) => {
     const { r } = res;
     const { attachmentId } = req.params;
@@ -29,6 +34,9 @@ export const getAttachment: Handler = async (req, res) => {
     r.send_ISE();
 };
 
+/**
+ * localhost:8000/file/:attachmentId
+ */
 export const getAttachmentDetails: Handler = async (req, res) => {
     const { r } = res;
     const { attachmentId } = req.params;
